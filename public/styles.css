@@ -1,0 +1,3573 @@
+@import url("https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=Noto+Serif+SC:wght@400;500;600;700;900&display=swap");
+
+:root {
+  color-scheme: dark;
+  --ink: #14110d;
+  --ink-soft: #211b15;
+  --panel: rgba(30, 25, 19, 0.94);
+  --panel-light: rgba(46, 37, 27, 0.84);
+  --paper: #d5c6a2;
+  --paper-dim: #96886b;
+  --gold: #c6a15b;
+  --gold-bright: #e5c77f;
+  --red: #a33a2d;
+  --red-bright: #d15a43;
+  --jade: #628b76;
+  --border: rgba(204, 174, 112, 0.18);
+  --border-strong: rgba(204, 174, 112, 0.38);
+  --shadow: 0 20px 55px rgba(0, 0, 0, 0.34);
+  font-family: "Noto Serif SC", "Songti SC", serif;
+  font-synthesis: none;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  min-width: 320px;
+  min-height: 100%;
+  background: var(--ink);
+}
+
+body {
+  min-height: 100vh;
+  margin: 0;
+  color: var(--paper);
+  background:
+    radial-gradient(circle at 52% -10%, rgba(137, 95, 45, 0.2), transparent 37%),
+    linear-gradient(110deg, #12100d 0%, #1d1812 48%, #100e0b 100%);
+  overflow-x: hidden;
+}
+
+button,
+input {
+  font: inherit;
+}
+
+button {
+  color: inherit;
+}
+
+button:focus-visible,
+input:focus-visible {
+  outline: 2px solid var(--gold-bright);
+  outline-offset: 3px;
+}
+
+.territory:focus-visible { outline: none; }
+.territory:focus-visible > path { stroke: var(--gold-bright); stroke-width: 1.8px; }
+.territory > path:focus,
+.strategic-region:focus,
+.army-marker:focus { outline: none; }
+.territory > path:focus-visible { stroke: var(--gold-bright); stroke-width: 2.4px; vector-effect: non-scaling-stroke; }
+
+.topbar {
+  height: 74px;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  padding: 0 30px;
+  background: rgba(14, 12, 10, 0.95);
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  backdrop-filter: blur(18px);
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  color: var(--paper);
+  text-decoration: none;
+  width: fit-content;
+}
+
+.brand-seal {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  color: #e4d4ad;
+  font-family: "Ma Shan Zheng", cursive;
+  font-size: 27px;
+  background: #873126;
+  border: 2px solid #bb7667;
+  box-shadow: inset 0 0 0 3px #6e261e, 0 5px 15px rgba(0, 0, 0, 0.25);
+  transform: rotate(-2deg);
+}
+
+.brand strong {
+  display: block;
+  font-size: 19px;
+  letter-spacing: 0.18em;
+  font-weight: 700;
+}
+
+.brand small {
+  display: block;
+  margin-top: 3px;
+  color: var(--paper-dim);
+  font-size: 9px;
+  letter-spacing: 0.48em;
+}
+
+.era-block {
+  min-width: 250px;
+  text-align: center;
+  font-size: 13px;
+  letter-spacing: 0.24em;
+  color: var(--gold-bright);
+}
+
+.turn-pips {
+  display: flex;
+  justify-content: center;
+  gap: 7px;
+  margin-top: 7px;
+}
+
+.action-label {
+  display: block;
+  margin-top: 5px;
+  color: var(--paper-dim);
+  font-size: 10px;
+  letter-spacing: .12em;
+}
+
+.map-year-label {
+  margin: 3px 0 0;
+  color: var(--paper-dim);
+  font-size: 10px;
+  letter-spacing: .12em;
+}
+
+.install-button:not([hidden]) { color: var(--gold-bright); }
+
+.turn-pips i {
+  width: 28px;
+  height: 3px;
+  background: var(--gold);
+  transition: 0.25s ease;
+  box-shadow: 0 0 8px rgba(220, 180, 96, 0.3);
+}
+
+.turn-pips i.used {
+  background: #3d352a;
+  box-shadow: none;
+}
+
+.top-actions {
+  justify-self: end;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.text-button,
+.icon-button {
+  border: 0;
+  background: transparent;
+  color: var(--paper-dim);
+  cursor: pointer;
+  padding: 9px 11px;
+  font-size: 12px;
+  letter-spacing: 0.12em;
+  transition: color 0.2s, background 0.2s;
+}
+
+.text-button:hover,
+.icon-button:hover {
+  color: var(--paper);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.cloud-button { display: inline-flex; align-items: center; gap: 6px; }
+.cloud-button i,
+.cloud-state > i {
+  width: 6px;
+  height: 6px;
+  flex: 0 0 auto;
+  border-radius: 50%;
+  background: #817664;
+  box-shadow: 0 0 0 2px rgba(129, 118, 100, .14);
+}
+.cloud-button[data-cloud-state="ready"] i,
+.cloud-state[data-cloud-state="ready"] > i { background: #6fa57a; box-shadow: 0 0 7px rgba(111, 165, 122, .72); }
+.cloud-button[data-cloud-state="syncing"] i,
+.cloud-state[data-cloud-state="syncing"] > i { background: #d0a24e; animation: cloudPulse 1s ease-in-out infinite; }
+.cloud-button[data-cloud-state="offline"] i,
+.cloud-state[data-cloud-state="offline"] > i { background: #ad5a48; }
+.cloud-button[data-cloud-state="conflict"] i,
+.cloud-state[data-cloud-state="conflict"] > i { background: #c17c48; box-shadow: 0 0 7px rgba(193, 124, 72, .62); }
+@keyframes cloudPulse { 50% { opacity: .35; transform: scale(.72); } }
+
+.danger-text:hover {
+  color: #d88170;
+}
+
+.icon-button {
+  font-size: 20px;
+  line-height: 1;
+}
+
+.resource-bar {
+  min-height: 64px;
+  display: grid;
+  grid-template-columns: repeat(5, minmax(120px, 1fr));
+  padding: 0 30px;
+  background: rgba(31, 26, 20, 0.72);
+  border-bottom: 1px solid var(--border);
+  position: relative;
+  z-index: 10;
+}
+
+.resource {
+  position: relative;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 10px;
+  max-width: 250px;
+  padding: 10px 20px;
+  border-right: 1px solid var(--border);
+}
+
+.resource:first-child {
+  border-left: 1px solid var(--border);
+}
+
+.resource-icon {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border: 1px solid var(--border-strong);
+  color: var(--gold-bright);
+  font-size: 13px;
+  border-radius: 50%;
+}
+
+.resource small,
+.resource strong {
+  display: block;
+}
+
+.resource small {
+  font-size: 9px;
+  letter-spacing: 0.2em;
+  color: var(--paper-dim);
+}
+
+.resource strong {
+  margin-top: 1px;
+  color: #eee3ca;
+  font-size: 17px;
+  font-variant-numeric: tabular-nums;
+}
+
+.resource em {
+  color: #7ca38c;
+  font-style: normal;
+  font-size: 9px;
+  white-space: nowrap;
+}
+
+.resource em.negative {
+  color: #bf7466;
+}
+
+.game-shell {
+  display: grid;
+  grid-template-columns: 216px minmax(570px, 1fr) 275px;
+  min-height: calc(100vh - 138px);
+  max-width: 1720px;
+  margin: 0 auto;
+}
+
+.left-rail,
+.right-rail {
+  padding: 20px 14px;
+  background: rgba(17, 14, 11, 0.55);
+}
+
+.left-rail {
+  border-right: 1px solid var(--border);
+}
+
+.right-rail {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  border-left: 1px solid var(--border);
+}
+
+.panel-ink {
+  position: relative;
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.025), transparent 42%),
+    var(--panel);
+  border: 1px solid var(--border);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.13);
+}
+
+.panel-ink::after {
+  content: "";
+  position: absolute;
+  width: 7px;
+  height: 7px;
+  right: 5px;
+  bottom: 5px;
+  border-right: 1px solid var(--gold);
+  border-bottom: 1px solid var(--gold);
+  opacity: 0.35;
+}
+
+.ruler-card {
+  padding: 15px 13px 13px;
+  display: grid;
+  grid-template-columns: 50px 1fr;
+  gap: 11px;
+}
+
+.ruler-portrait {
+  position: relative;
+  width: 50px;
+  height: 58px;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  background: linear-gradient(160deg, #625336, #2f281d);
+  border: 1px solid var(--border-strong);
+}
+
+.ruler-portrait::before {
+  content: "";
+  position: absolute;
+  inset: 4px;
+  border: 1px solid rgba(225, 199, 127, 0.23);
+}
+
+.ruler-portrait span {
+  font-family: "Ma Shan Zheng", cursive;
+  font-size: 28px;
+  color: #e6d3a8;
+  z-index: 1;
+}
+
+.ruler-portrait i {
+  position: absolute;
+  width: 60px;
+  height: 20px;
+  border-radius: 50%;
+  bottom: -12px;
+  background: #7d3127;
+}
+
+.ruler-card small {
+  color: var(--paper-dim);
+  font-size: 9px;
+  letter-spacing: 0.2em;
+}
+
+.ruler-card h2 {
+  margin: 3px 0 1px;
+  color: #eee1c4;
+  font-size: 17px;
+  letter-spacing: 0.08em;
+}
+
+.ruler-card p {
+  margin: 0;
+  color: var(--gold);
+  font-size: 10px;
+}
+
+.mandate-meter {
+  grid-column: 1 / -1;
+  padding-top: 10px;
+  border-top: 1px solid var(--border);
+}
+
+.mandate-meter > span {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 5px;
+  font-size: 9px;
+}
+
+.mandate-meter b {
+  color: var(--paper-dim);
+  letter-spacing: 0.2em;
+}
+
+.mandate-meter em {
+  color: #9bb09e;
+  font-style: normal;
+}
+
+.mandate-meter > div,
+.goal-track {
+  height: 3px;
+  background: #332d24;
+  overflow: hidden;
+}
+
+.mandate-meter i,
+.goal-track i {
+  display: block;
+  height: 100%;
+  width: 30%;
+  background: linear-gradient(90deg, #7a2d25, var(--gold));
+  transition: width 0.45s ease;
+}
+
+.main-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin: 18px 0;
+}
+
+.nav-item {
+  display: grid;
+  grid-template-columns: 36px 1fr;
+  grid-template-rows: 1fr 1fr;
+  align-items: center;
+  text-align: left;
+  padding: 11px 10px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--paper-dim);
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.nav-item > span {
+  grid-row: 1 / 3;
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 32px;
+  font-family: "Ma Shan Zheng", cursive;
+  color: #8d7d5e;
+  font-size: 20px;
+}
+
+.nav-item b {
+  font-size: 13px;
+  letter-spacing: 0.12em;
+  color: #bdaf92;
+}
+
+.nav-item small {
+  font-size: 9px;
+  letter-spacing: 0.15em;
+  color: #6f6657;
+}
+
+.nav-item:hover {
+  background: rgba(255, 255, 255, 0.025);
+  border-color: var(--border);
+}
+
+.nav-item.active {
+  background: linear-gradient(90deg, rgba(132, 48, 38, 0.28), rgba(99, 77, 38, 0.07));
+  border-color: rgba(174, 111, 75, 0.22);
+  box-shadow: inset 3px 0 #9d3e31;
+}
+
+.nav-item.active b,
+.nav-item.active > span {
+  color: var(--gold-bright);
+}
+
+.campaign-goal {
+  padding: 14px 13px;
+}
+
+.section-kicker {
+  color: var(--gold);
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+}
+
+.goal-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin: 9px 0 7px;
+}
+
+.goal-row strong {
+  color: #eadfc6;
+  font-size: 20px;
+}
+
+.goal-row > span {
+  color: var(--paper-dim);
+  font-size: 10px;
+}
+
+.campaign-goal p {
+  margin: 11px 0 0;
+  color: #807665;
+  font-size: 9px;
+  line-height: 1.7;
+}
+
+.stage {
+  min-width: 0;
+  padding: 24px 24px 30px;
+  background:
+    linear-gradient(rgba(17, 14, 11, 0.72), rgba(17, 14, 11, 0.83)),
+    radial-gradient(circle at center, rgba(158, 119, 61, 0.14), transparent 60%);
+}
+
+.view {
+  display: none;
+  animation: reveal 0.32s ease;
+}
+
+.view.active {
+  display: block;
+}
+
+@keyframes reveal {
+  from { opacity: 0; transform: translateY(5px); }
+  to { opacity: 1; transform: none; }
+}
+
+.stage-heading {
+  min-height: 48px;
+  display: flex;
+  justify-content: space-between;
+  align-items: end;
+  margin-bottom: 17px;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 10px;
+}
+
+.stage-heading h1 {
+  margin: 2px 0 0;
+  color: #e4d8be;
+  font-size: 23px;
+  letter-spacing: 0.15em;
+  font-weight: 600;
+}
+
+.legend {
+  display: flex;
+  gap: 14px;
+  font-size: 9px;
+  color: var(--paper-dim);
+}
+
+.legend span {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.legend i {
+  width: 10px;
+  height: 10px;
+  display: inline-block;
+  transform: rotate(45deg);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.legend-player { background: #8e392e; }
+.legend-enemy { background: #4d554a; }
+.legend-dynasty { background: #a8874b; }
+.legend-rebel { background: #98473b; }
+.legend-foreign { background: #5f7971; }
+.legend-dao { background: transparent; border-style: dashed !important; border-color: rgba(214, 190, 132, .75) !important; }
+.legend-selected { background: transparent; box-shadow: 0 0 0 2px var(--gold); }
+.legend-border { background: transparent; border-color: #c6a15b !important; box-shadow: 0 0 0 1px #c6a15b; }
+.legend-front { background: #c46751; box-shadow: none; }
+.legend-siege { background: #b88635; box-shadow: 0 0 7px #d6a850; }
+.end-turn strong { margin-left: 0.28em; }
+
+/* 未开局时只保留创建王朝的对话框，避免初始 HUD 与新游戏状态冲突。 */
+body.pre-game { overflow: hidden; }
+body.pre-game > .topbar,
+body.pre-game > .resource-bar,
+body.pre-game > .game-shell,
+body.pre-game > .map-mode-bar,
+body.pre-game > .toast-stack,
+body.pre-game > .pwa-update-banner { display: none !important; }
+body.pre-game > .setup-modal[open] { display: flex; }
+
+.map-and-detail {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 17px;
+  align-items: start;
+}
+
+.map-frame {
+  position: relative;
+  min-height: 620px;
+  padding: 12px;
+  background:
+    radial-gradient(circle at 48% 45%, rgba(188, 160, 101, 0.18), transparent 55%),
+    linear-gradient(160deg, #1a3031, #132527 48%, #192d2e);
+  border: 1px solid var(--border-strong);
+  box-shadow: inset 0 0 60px rgba(0, 0, 0, 0.32), var(--shadow);
+}
+
+.map-frame svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  min-height: 620px;
+  max-height: 720px;
+}
+
+.map-corner {
+  position: absolute;
+  z-index: 3;
+  width: 21px;
+  height: 21px;
+  pointer-events: none;
+}
+
+.top-left { top: 5px; left: 5px; border-top: 1px solid var(--gold); border-left: 1px solid var(--gold); }
+.top-right { top: 5px; right: 5px; border-top: 1px solid var(--gold); border-right: 1px solid var(--gold); }
+.bottom-left { bottom: 5px; left: 5px; border-bottom: 1px solid var(--gold); border-left: 1px solid var(--gold); }
+.bottom-right { bottom: 5px; right: 5px; border-bottom: 1px solid var(--gold); border-right: 1px solid var(--gold); }
+
+.river {
+  fill: none;
+  stroke: rgba(90, 137, 143, 0.48);
+  stroke-width: 9px;
+  stroke-linecap: round;
+  pointer-events: none;
+}
+
+.world-coast {
+  fill: #655e45;
+  stroke: #ba9f6c;
+  stroke-width: 5px;
+  stroke-linejoin: round;
+  opacity: 0.46;
+  pointer-events: none;
+}
+
+.neighboring-lands {
+  pointer-events: none;
+  opacity: 0.45;
+}
+
+.neighboring-lands path {
+  fill: #766c4e;
+  stroke: #a18f63;
+  stroke-width: 2px;
+  stroke-dasharray: 10 7;
+}
+
+.neighboring-lands text {
+  fill: #c0ae84;
+  text-anchor: middle;
+  font-size: 13px;
+  letter-spacing: 0.5em;
+}
+
+.river.minor {
+  stroke-width: 5px;
+  opacity: 0.63;
+}
+
+.territory {
+  cursor: pointer;
+}
+
+.territory > path {
+  fill: #484a3c;
+  stroke: #928469;
+  stroke-width: 1px;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+}
+
+.territory:hover > path {
+  stroke: #c3a96c;
+  fill-opacity: .58;
+}
+
+.territory.player > path {
+  fill: #85372d;
+  stroke: #cc8a6a;
+}
+
+.territory.selected > path {
+  stroke: #efcf80;
+  stroke-width: 1.25px;
+}
+
+.territory.attackable > path {
+  stroke-dasharray: 8 5;
+}
+
+.territory.besieged > path {
+  stroke: #db9d43;
+  stroke-width: 2.5px;
+  stroke-dasharray: 5 4;
+}
+
+.territory > text {
+  fill: #eadfc5;
+  text-anchor: middle;
+  font-size: 19px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  pointer-events: none;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.65);
+}
+
+.territory .map-owner {
+  fill: #c1b38f;
+  font-size: 9px;
+  font-weight: 400;
+  letter-spacing: 0.08em;
+}
+
+.water-label,
+.terrain-labels text {
+  fill: #a9997a;
+  font-size: 9px;
+  font-weight: 400;
+  letter-spacing: 0.05em;
+  pointer-events: none;
+}
+
+.capital-site,
+.domain-assets {
+  pointer-events: none;
+}
+
+.capital-site path {
+  fill: rgba(25, 20, 15, 0.75);
+  stroke: #efddb1;
+  stroke-width: 2px;
+  vector-effect: non-scaling-stroke;
+}
+
+.capital-site text {
+  fill: #f0deb4;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-anchor: start;
+  paint-order: stroke;
+  stroke: #211a13;
+  stroke-width: 3px;
+}
+
+.domain-assets {
+  opacity: 0;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.territory.player .domain-assets {
+  opacity: 1;
+}
+
+.farm-icon { transform: scale(var(--farm-scale, 1)); }
+.barracks-icon { scale: var(--camp-scale, 1); }
+
+.farm-icon rect {
+  fill: rgba(164, 134, 52, 0.82);
+  stroke: #f1d782;
+  stroke-width: 2px;
+}
+
+.farm-icon rect + * { pointer-events: none; }
+
+.barracks-icon path {
+  fill: rgba(54, 27, 23, 0.82);
+  stroke: #e4ad82;
+  stroke-width: 2px;
+  vector-effect: non-scaling-stroke;
+}
+
+.water-label {
+  fill: rgba(118, 168, 174, 0.72);
+  font-size: 11px;
+  font-style: italic;
+}
+
+.terrain-labels text {
+  fill: rgba(209, 190, 145, 0.48);
+  font-size: 10px;
+}
+
+.mountains {
+  fill: none;
+  stroke: #c9b684;
+  stroke-width: 3px;
+  opacity: 0.33;
+  pointer-events: none;
+}
+
+/* 真实地理战略层：山河在底，道府州是行政色，100 个节点是战争单位。 */
+.territory > .capital-site,
+.territory > .domain-assets { display: none; }
+.territory > text { opacity: .72; font-size: 17px; }
+.territory .map-owner { opacity: .42; font-size: 8px; }
+.territory.selected > path { stroke-width: 1.25px; filter: none; }
+.territory.selected-region-province > path { stroke: rgba(236,203,126,.52); stroke-width: 1px; }
+
+.mountain-ranges { pointer-events: none; }
+.mountain-ranges .range {
+  fill: none;
+  stroke: rgba(190,169,118,.38);
+  stroke-width: 8;
+  stroke-linecap: round;
+  stroke-dasharray: 3 5;
+}
+.mountain-ranges .range::after { content: ""; }
+.minor-label { font-size: 8px; }
+
+.route-layer, .region-layer { isolation: isolate; }
+.strategic-route {
+  fill: none;
+  stroke: rgba(197,179,137,.2);
+  stroke-width: 2;
+  stroke-linecap: round;
+  pointer-events: none;
+}
+.strategic-route.mountain, .strategic-route.pass { stroke-dasharray: 3 5; }
+.strategic-route.river { stroke: rgba(101,160,168,.42); stroke-width: 3; }
+.strategic-route.water { stroke: rgba(101,160,168,.48); stroke-width: 3; stroke-dasharray: 8 5; }
+body.map-mode-supply .strategic-route,
+body.map-mode-terrain .strategic-route,
+body.map-mode-military .strategic-route { opacity: 1; stroke: rgba(219,197,146,.46); }
+body.map-mode-terrain .strategic-route.river,
+body.map-mode-terrain .strategic-route.water { stroke: rgba(95,177,188,.75); }
+
+.strategic-region { cursor: pointer; }
+.strategic-region .region-shape {
+  fill: #181a17;
+  stroke: var(--region-color, #8b765b);
+  stroke-width: 1.6;
+  vector-effect: non-scaling-stroke;
+}
+.strategic-region .region-influence {
+  fill: transparent;
+  /* The influence halo is visual only.  Let the actual marker glyph receive
+     pointer events so its hit area cannot swallow clicks on the geographic
+     polygon underneath it. */
+  pointer-events: none;
+}
+body.map-mode-faction .strategic-region .region-influence,
+body.map-mode-diplomacy .strategic-region .region-influence { fill: color-mix(in srgb, var(--region-color) 28%, transparent); }
+.strategic-region.capital .region-shape { fill: var(--region-color); stroke: #f2d692; stroke-width: 2.2; }
+.strategic-region.gate .region-shape { fill: none; stroke: #d3b56e; stroke-width: 2; }
+.strategic-region.port .region-shape { fill: #233c43; stroke: #72aab1; }
+.strategic-region.farm .region-shape { fill: #5f5730; stroke: #d0bb62; }
+.region-glyph { fill: #f6dfad; text-anchor: middle; font-size: 9px; font-weight: 800; pointer-events: none; }
+.gate .region-glyph { fill: #f0d187; font-size: 9px; }
+.region-label {
+  fill: #ead9b3;
+  font-size: 15px;
+  font-weight: 650;
+  paint-order: stroke;
+  stroke: rgba(17,16,13,.95);
+  stroke-width: 1.8px;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+  pointer-events: none;
+}
+.strategic-region:hover .region-shape { stroke: #fff0ad; }
+.strategic-region.selected .region-shape { stroke: #fff1a9; stroke-width: 2.4; }
+.strategic-region.selected .region-label { fill: #fff0bd; font-weight: 900; }
+.strategic-region.move-target .region-shape { stroke: #8fd2a0; stroke-dasharray: 3 2; }
+.strategic-region.attack-target .region-shape { stroke: #e7a659; stroke-width: 2.2; stroke-dasharray: 3 2; }
+.strategic-region.army-origin .region-shape { stroke: #f0dfaa; }
+.strategic-region.order-target .region-shape { stroke: #ffd273; stroke-width: 2.8; stroke-dasharray: none; }
+.strategic-region.contested .region-shape { stroke: #ef664c; stroke-width: 2.5; }
+.strategic-region.capital .region-label { font-size: 18px; font-weight: 800; }
+.strategic-region.gate .region-label,
+.strategic-region.port .region-label { font-size: 16px; }
+
+body.map-mode-terrain .territory > path { fill: #4b4b3c; opacity: .67; }
+body.map-mode-terrain .strategic-region .region-shape { stroke: #d1bd91; }
+body.map-mode-supply .territory > path { fill: #303731; opacity: .72; }
+body.map-mode-supply .strategic-region .region-shape { fill: color-mix(in srgb, #669064 var(--supply, 65%), #3a2724); }
+body.map-mode-supply .strategic-region .region-influence { fill: color-mix(in srgb, rgba(87,144,83,.36) var(--supply, 55%), rgba(99,43,38,.18)); }
+body.map-mode-population .territory > path { fill: #303331; opacity: .72; }
+body.map-mode-population .strategic-region .region-shape { fill: color-mix(in srgb, #c3a45c var(--region-population, 50%), #282d2b); }
+body.map-mode-grain .strategic-region .region-shape { fill: color-mix(in srgb, #b8a748 var(--region-grain, 50%), #29302a); }
+body.map-mode-military .region-label { font-size: 14px; }
+
+.key-gate { width: 11px; height: 11px; border: 2px solid #d3b56e; border-bottom-width: 4px; }
+.key-port { width: 11px; height: 11px; border-radius: 50%; background: #315863; border: 2px solid #72aab1; }
+
+.map-stamp {
+  position: absolute;
+  right: 29px;
+  bottom: 23px;
+  display: grid;
+  place-items: center;
+  width: 45px;
+  height: 50px;
+  color: rgba(183, 79, 62, 0.77);
+  font-family: "Ma Shan Zheng", cursive;
+  font-size: 15px;
+  text-align: center;
+  border: 2px solid rgba(183, 79, 62, 0.66);
+  transform: rotate(-4deg);
+}
+
+.map-key {
+  position: absolute;
+  left: 25px;
+  bottom: 20px;
+  z-index: 4;
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 7px 10px;
+  color: #cbbd9f;
+  background: rgba(19, 17, 13, 0.78);
+  border: 1px solid rgba(211, 183, 120, 0.32);
+  font-size: 8px;
+  backdrop-filter: blur(5px);
+}
+
+.map-key span { display: flex; align-items: center; gap: 5px; }
+.map-key small { color: #7f7461; }
+.map-key b { display: inline-block; width: 13px; height: 11px; }
+.key-city { border: 2px solid #e5d0a0; background: #2c2118; }
+.key-farm { background: repeating-linear-gradient(90deg, #bc9a3d 0 2px, #685a2d 2px 4px); border: 1px solid #e2c96f; }
+.key-camp { clip-path: polygon(50% 0, 100% 45%, 84% 100%, 16% 100%, 0 45%); background: #a7654c; border: 1px solid #e4ad82; }
+
+.province-card {
+  padding: 16px;
+  min-height: 0;
+  position: static;
+  display: grid;
+  grid-template-columns: 1.1fr 1.3fr 1fr;
+  gap: 0 16px;
+}
+
+.province-banner {
+  display: grid;
+  grid-template-columns: 44px 1fr;
+  gap: 11px;
+  align-items: center;
+  padding-bottom: 13px;
+  border-bottom: 1px solid var(--border);
+}
+
+.province-card > .province-banner { grid-column: 1; grid-row: 1 / 3; }
+.province-card > p { grid-column: 2; grid-row: 1; margin-top: 0; }
+.province-card > .province-stats { grid-column: 2; grid-row: 2; }
+.province-card > .province-assets { grid-column: 1 / 3; grid-row: 3; }
+.province-card > .region-meta-grid { grid-column: 1 / 3; grid-row: 4; }
+.province-card > .controller-row { grid-column: 3; grid-row: 1; align-self: start; }
+.province-card > .campaign-strip { grid-column: 3; grid-row: 2; }
+.province-card > .primary-action { grid-column: 3; grid-row: 3 / 6; align-self: end; }
+.province-card > .adjacency-note { grid-column: 1 / 3; grid-row: 5; }
+
+.province-banner > span {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 49px;
+  background: #713027;
+  border: 1px solid #ac6557;
+  color: #eadbb9;
+  font-family: "Ma Shan Zheng", cursive;
+  font-size: 27px;
+}
+
+.province-banner small {
+  color: var(--paper-dim);
+  font-size: 8px;
+  letter-spacing: 0.14em;
+}
+
+.province-banner h2 {
+  margin: 2px 0 0;
+  color: #e9ddc2;
+  font-size: 19px;
+}
+
+.province-banner b {
+  display: block;
+  margin-top: 3px;
+  color: #a99978;
+  font-size: 8px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.province-banner i {
+  grid-column: 1 / -1;
+  width: fit-content;
+  padding: 3px 7px;
+  color: #92b29e;
+  background: rgba(74, 119, 91, 0.13);
+  border: 1px solid rgba(92, 145, 111, 0.25);
+  font-style: normal;
+  font-size: 8px;
+  letter-spacing: 0.12em;
+}
+
+.province-card > p {
+  color: #938875;
+  font-size: 10px;
+  line-height: 1.8;
+}
+
+.province-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  margin: 13px 0;
+  border: 1px solid var(--border);
+}
+
+.province-stats.four { grid-template-columns: repeat(4, 1fr); }
+
+.province-stats div {
+  padding: 8px 3px;
+  text-align: center;
+  border-right: 1px solid var(--border);
+}
+
+.province-stats div:last-child { border: 0; }
+.province-stats span, .province-stats strong { display: block; }
+.province-stats span { color: #746b5b; font-size: 8px; }
+.province-stats strong { margin-top: 3px; color: #d7c9aa; font-size: 12px; }
+
+.province-assets {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 7px;
+  margin-top: 4px;
+}
+
+.province-assets > span {
+  display: grid;
+  grid-template-columns: 28px 1fr;
+  grid-template-rows: auto auto;
+  column-gap: 7px;
+  align-items: center;
+  padding: 6px 8px;
+  background: rgba(117, 92, 51, 0.08);
+  border: 1px solid var(--border);
+}
+
+.province-assets b {
+  grid-row: 1 / 3;
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  color: #ead8ad;
+  border: 1px solid #9f8050;
+  font-size: 11px;
+}
+
+.province-assets i { color: #776d5c; font-size: 7px; font-style: normal; }
+.province-assets strong { color: #cdbd9b; font-size: 9px; font-weight: 600; }
+.province-assets .asset-city { background: #38271d; }
+.province-assets .asset-farm { background: #5f592d; }
+.province-assets .asset-camp { background: #612f27; }
+.province-assets.enemy span { opacity: .42; }
+
+.region-meta-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 5px 9px;
+  margin-top: 7px;
+}
+.region-meta-grid span { display: flex; justify-content: space-between; gap: 7px; min-width: 0; padding: 4px 6px; background: rgba(255,255,255,.025); border: 1px solid rgba(205,171,108,.12); }
+.region-meta-grid i { color: #746b5b; font-size: 7px; font-style: normal; white-space: nowrap; }
+.region-meta-grid strong { overflow: hidden; color: #c8b895; font-size: 8px; font-weight: 600; text-align: right; text-overflow: ellipsis; white-space: nowrap; }
+
+.controller-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 9px 0;
+  font-size: 9px;
+  border-top: 1px dotted var(--border-strong);
+  border-bottom: 1px dotted var(--border-strong);
+}
+
+.controller-row span { color: #756c5d; }
+.controller-row strong { color: var(--gold); text-align: right; }
+
+.campaign-strip {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 8px;
+  color: #c5934e;
+  font-size: 8px;
+}
+
+.campaign-strip > div { height: 5px; background: #3b3023; overflow: hidden; }
+.campaign-strip i { display: block; height: 100%; width: 0; background: linear-gradient(90deg, #a03b2e, #e0a64c); transition: width .35s; }
+.campaign-strip strong { color: #e2bd7b; }
+
+.primary-action {
+  width: 100%;
+  padding: 11px 18px;
+  margin-top: 13px;
+  border: 1px solid #b55d4d;
+  color: #f0ddbb;
+  background: linear-gradient(180deg, #9d3f31, #762b24);
+  box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.04), 0 8px 18px rgba(0, 0, 0, 0.18);
+  cursor: pointer;
+  font-size: 12px;
+  letter-spacing: 0.16em;
+  transition: filter 0.2s, transform 0.2s;
+}
+
+.primary-action:hover { filter: brightness(1.14); transform: translateY(-1px); }
+.primary-action:disabled { cursor: not-allowed; filter: grayscale(0.8); opacity: 0.5; transform: none; }
+.hidden { display: none !important; }
+
+.adjacency-note {
+  font-size: 8px !important;
+  color: #665e51 !important;
+}
+.adjacency-note > span { display: block; margin-bottom: 4px; color: #8e8068; }
+.adjacency-note > div { display: flex; flex-wrap: wrap; gap: 4px; }
+.adjacency-note button { padding: 3px 6px; color: #b9a781; background: rgba(100,82,49,.18); border: 1px solid rgba(181,147,82,.28); cursor: pointer; font-size: 7px; }
+.adjacency-note button:hover { color: #f0d793; border-color: #b8904d; }
+
+.heading-note {
+  margin: 0;
+  color: var(--paper-dim);
+  font-size: 9px;
+  letter-spacing: 0.15em;
+}
+
+.action-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 13px;
+}
+
+.court-action {
+  position: relative;
+  display: grid;
+  grid-template-columns: 54px 1fr auto;
+  align-items: center;
+  gap: 12px;
+  min-height: 106px;
+  padding: 14px;
+  text-align: left;
+  background: linear-gradient(135deg, rgba(68, 56, 40, 0.7), rgba(30, 25, 20, 0.86));
+  border: 1px solid var(--border);
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.court-action::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: var(--gold);
+  opacity: 0.35;
+}
+
+.court-action:hover { border-color: var(--border-strong); transform: translateY(-2px); background-color: rgba(70, 57, 39, 0.5); }
+.court-action:disabled { opacity: 0.45; cursor: not-allowed; transform: none; }
+
+.court-icon {
+  display: grid;
+  place-items: center;
+  width: 50px;
+  height: 58px;
+  color: #dac69a;
+  font-family: "Ma Shan Zheng", cursive;
+  font-size: 24px;
+  background: rgba(16, 13, 10, 0.5);
+  border: 1px solid var(--border);
+}
+
+.court-action small,
+.court-action b,
+.court-action em { display: block; }
+.court-action b { color: #e6d9bd; font-size: 15px; letter-spacing: 0.08em; }
+.court-action small { margin-top: 4px; color: #807665; font-size: 9px; line-height: 1.5; }
+.court-action em { margin-top: 7px; color: #9d8e70; font-size: 8px; font-style: normal; }
+.court-action > strong { color: #bfa365; font-size: 16px; font-weight: 500; }
+
+.policy-summary {
+  display: grid;
+  grid-template-columns: 1.5fr repeat(4, 1fr);
+  align-items: center;
+  gap: 10px;
+  margin-top: 16px;
+  padding: 16px;
+}
+
+.policy-summary h2 { margin: 3px 0 0; color: #e6dbc1; font-size: 16px; }
+.policy-stat { padding: 8px 10px; border-left: 1px solid var(--border); }
+.policy-stat span, .policy-stat strong { display: block; }
+.policy-stat span { color: #786f60; font-size: 8px; }
+.policy-stat strong { margin-top: 5px; color: var(--gold-bright); font-size: 16px; }
+
+.army-power { text-align: right; }
+.army-power small, .army-power strong { display: block; }
+.army-power small { color: var(--paper-dim); font-size: 8px; letter-spacing: 0.16em; }
+.army-power strong { color: var(--gold-bright); font-size: 22px; }
+
+.army-overview {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 13px;
+}
+
+.unit-card {
+  position: relative;
+  padding: 18px;
+  overflow: hidden;
+  text-align: center;
+  background: linear-gradient(160deg, rgba(78, 62, 41, 0.48), rgba(27, 22, 17, 0.92));
+  border: 1px solid var(--border);
+}
+
+.unit-card::after {
+  position: absolute;
+  content: "";
+  width: 100px;
+  height: 100px;
+  right: -45px;
+  top: -55px;
+  border-radius: 50%;
+  background: var(--unit-color, #95644c);
+  opacity: 0.11;
+}
+
+.unit-icon {
+  display: grid;
+  place-items: center;
+  width: 56px;
+  height: 56px;
+  margin: 0 auto 10px;
+  border: 1px solid var(--border-strong);
+  border-radius: 50%;
+  color: var(--gold-bright);
+  font-family: "Ma Shan Zheng", cursive;
+  font-size: 23px;
+  background: rgba(10, 8, 6, 0.34);
+}
+
+.unit-card > small { color: #766b59; font-size: 8px; letter-spacing: 0.24em; }
+.unit-card h2 { margin: 2px 0 0; color: #e9ddc2; font-size: 16px; }
+.unit-card > strong { display: block; margin: 5px 0; color: var(--gold-bright); font-size: 26px; }
+.unit-card p { margin: 0 0 12px; color: #7f7564; font-size: 8px; }
+.unit-card button {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid var(--border-strong);
+  background: rgba(126, 49, 38, 0.28);
+  color: #d7c4a0;
+  cursor: pointer;
+  font-size: 10px;
+}
+.unit-card button:hover { background: rgba(156, 63, 48, 0.45); }
+.unit-card button:disabled { opacity: 0.4; cursor: not-allowed; }
+.unit-card em { display: block; margin-top: 7px; color: #6d6456; font-size: 7px; font-style: normal; }
+.archers { --unit-color: #568a70; }
+.cavalry { --unit-color: #a68443; }
+
+.military-orders {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 13px;
+  margin: 13px 0;
+}
+
+.order-card {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 4px;
+  padding: 12px 14px;
+  text-align: left;
+  border: 1px solid var(--border);
+  background: rgba(48, 41, 31, 0.56);
+  cursor: pointer;
+}
+.order-card span { color: #dfd2b6; font-size: 12px; }
+.order-card small { grid-row: 2; color: #766d5e; font-size: 8px; }
+.order-card strong { grid-row: 1 / 3; align-self: center; color: #9fb29a; font-size: 10px; }
+.order-card:hover { border-color: var(--border-strong); }
+.order-card:disabled { opacity: 0.4; cursor: not-allowed; }
+
+.frontier {
+  padding: 16px;
+}
+.frontier > div:first-child { display: flex; align-items: baseline; gap: 12px; }
+.frontier h2 { margin: 0; color: #e3d7bc; font-size: 15px; }
+.frontier-list { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 12px; }
+.frontier-target {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 4px;
+  padding: 9px;
+  text-align: left;
+  border: 1px solid var(--border);
+  background: rgba(23, 19, 15, 0.55);
+  cursor: pointer;
+}
+.frontier-target b { color: #d8cbaa; font-size: 11px; }
+.frontier-target span { color: #776d5d; font-size: 8px; }
+.frontier-target strong { grid-row: 1 / 3; align-self: center; color: #ba6c5c; font-size: 9px; }
+.frontier-target:hover { border-color: var(--gold); }
+.frontier-empty { color: #756c5d; font-size: 9px; }
+
+.season-card {
+  display: flex;
+  gap: 11px;
+  align-items: center;
+  padding: 12px;
+  background: linear-gradient(110deg, rgba(75, 85, 55, 0.25), rgba(39, 31, 23, 0.72));
+  border: 1px solid var(--border);
+}
+
+.season-sun {
+  display: grid;
+  place-items: center;
+  flex: 0 0 46px;
+  width: 46px;
+  height: 46px;
+  border: 1px solid rgba(211, 177, 102, 0.42);
+  border-radius: 50%;
+  color: var(--gold-bright);
+  font-family: "Ma Shan Zheng", cursive;
+  font-size: 22px;
+  box-shadow: inset 0 0 18px rgba(192, 153, 72, 0.08);
+}
+
+.season-card small,
+.season-card strong { display: block; }
+.season-card small { color: var(--paper-dim); font-size: 8px; letter-spacing: 0.2em; }
+.season-card strong { margin-top: 2px; color: #ddd0b3; font-size: 12px; }
+.season-card p { margin: 3px 0 0; color: #82997f; font-size: 8px; }
+
+.advisor-card { padding: 14px; }
+.advisor-header { display: flex; gap: 10px; align-items: center; }
+.advisor-avatar {
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 42px;
+  background: #3d392e;
+  border: 1px solid var(--border);
+  color: #cfb87e;
+  font-family: "Ma Shan Zheng", cursive;
+  font-size: 19px;
+}
+.advisor-header small, .advisor-header strong { display: block; }
+.advisor-header small { color: #7e7463; font-size: 8px; }
+.advisor-header strong { color: #d8cbae; font-size: 11px; margin-top: 2px; }
+.advisor-card blockquote {
+  position: relative;
+  margin: 12px 0 0;
+  padding: 11px 10px 8px;
+  color: #9d927e;
+  background: rgba(0, 0, 0, 0.13);
+  border-top: 1px solid var(--border);
+  font-size: 9px;
+  line-height: 1.8;
+}
+
+.chronicle {
+  min-height: 235px;
+  max-height: calc(100vh - 435px);
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 14px;
+  overflow: hidden;
+}
+
+.chronicle-title {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 9px;
+  border-bottom: 1px solid var(--border);
+}
+.chronicle-title h2 { margin: 2px 0 0; color: #ded2b8; font-size: 14px; }
+.chronicle-title button { border: 0; background: transparent; color: #696154; font-size: 8px; cursor: pointer; }
+.log-list { overflow-y: auto; padding-right: 5px; scrollbar-width: thin; scrollbar-color: #5f4c35 transparent; }
+.log-entry {
+  display: grid;
+  grid-template-columns: 8px 1fr;
+  column-gap: 8px;
+  padding: 9px 0;
+  border-bottom: 1px dotted rgba(204, 174, 112, 0.12);
+}
+.log-entry::before { content: ""; width: 5px; height: 5px; margin-top: 5px; border-radius: 50%; background: #7a725f; }
+.log-entry.good::before { background: #6d9d78; }
+.log-entry.bad::before { background: #b75143; }
+.log-entry.war::before { background: var(--gold); box-shadow: 0 0 6px var(--gold); }
+.log-entry time { color: #635b4f; font-size: 7px; }
+.log-entry p { margin: 2px 0 0; color: #948977; font-size: 8px; line-height: 1.55; }
+
+.end-turn {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 15px;
+  border: 1px solid #9d493b;
+  background: linear-gradient(110deg, #783027, #4f231e);
+  cursor: pointer;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.22);
+  transition: 0.2s;
+}
+.end-turn:hover { filter: brightness(1.15); transform: translateY(-1px); }
+.end-turn small, .end-turn strong { display: block; text-align: left; }
+.end-turn small { color: #b6927c; font-size: 7px; letter-spacing: 0.2em; }
+.end-turn strong { color: #eedcba; font-size: 12px; margin-top: 2px; margin-left: .32em; letter-spacing: 0.1em; }
+.end-turn i { display: grid; place-items: center; width: 26px; height: 26px; margin-left: .45em; border: 1px solid rgba(239, 212, 171, 0.25); border-radius: 50%; font-style: normal; }
+
+.autosave-note { margin: -6px 0 0; color: #61594c; text-align: center; font-size: 7px; }
+.autosave-note span { display: inline-block; width: 5px; height: 5px; margin-right: 5px; border-radius: 50%; background: #5b8d6b; }
+
+.toast-stack {
+  position: fixed;
+  z-index: 200;
+  left: 50%;
+  bottom: 25px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
+.pwa-update-banner {
+  position: fixed;
+  left: 50%;
+  right: auto;
+  top: 72px;
+  bottom: auto;
+  z-index: 1200;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  max-width: min(320px, calc(100vw - 28px));
+  padding: 9px 11px;
+  color: var(--paper);
+  background: rgba(24, 20, 15, .97);
+  border: 1px solid var(--border-strong);
+  box-shadow: 0 8px 22px rgba(0, 0, 0, .32);
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+.pwa-update-banner[hidden] { display: none; }
+.pwa-update-banner b,
+.pwa-update-banner span { display: block; }
+.pwa-update-banner b { color: var(--gold-bright); font-size: 11px; }
+.pwa-update-banner span { margin-top: 2px; color: var(--paper-dim); font-size: 9px; }
+.pwa-update-actions { display: flex; align-items: center; gap: 5px; margin-left: auto; white-space: nowrap; }
+.pwa-update-actions button { border: 1px solid var(--border-strong); padding: 5px 7px; color: var(--paper); background: transparent; cursor: pointer; pointer-events: auto; font-size: 9px; }
+.pwa-update-actions .primary-action { border-color: transparent; }
+
+@media (max-width: 780px) {
+  .pwa-update-banner {
+    top: auto;
+    bottom: 52px;
+  }
+}
+
+.toast {
+  min-width: 220px;
+  padding: 10px 15px;
+  color: #eadfc7;
+  background: rgba(33, 27, 20, 0.96);
+  border: 1px solid var(--border-strong);
+  box-shadow: var(--shadow);
+  text-align: center;
+  font-size: 10px;
+  animation: toastIn 0.28s ease, toastOut 0.3s ease 2.7s forwards;
+}
+.toast.good { border-color: rgba(87, 145, 104, 0.55); }
+.toast.bad { border-color: rgba(177, 72, 56, 0.62); }
+@keyframes toastIn { from { opacity: 0; transform: translateY(8px); } }
+@keyframes toastOut { to { opacity: 0; transform: translateY(8px); } }
+
+dialog {
+  padding: 0;
+  color: var(--paper);
+  background: #201a14;
+  border: 1px solid var(--border-strong);
+  box-shadow: 0 35px 100px rgba(0, 0, 0, 0.72);
+}
+
+dialog::backdrop {
+  background: rgba(5, 4, 3, 0.82);
+  backdrop-filter: blur(6px) sepia(0.2);
+}
+
+dialog[open] { animation: dialogIn 0.28s ease; }
+@keyframes dialogIn { from { opacity: 0; transform: translateY(10px) scale(0.98); } }
+
+.setup-modal { width: min(530px, calc(100% - 30px)); }
+.setup-modal form { position: relative; padding: 34px 42px 28px; background: radial-gradient(circle at top, rgba(147, 105, 52, 0.16), transparent 50%); }
+.modal-ornament { position: absolute; top: 14px; right: 17px; color: #744c34; font-size: 24px; }
+.setup-modal h1, .battle-modal h1, .event-modal h1, .help-modal h1, .cloud-modal h1 { margin: 5px 0 8px; color: #eddfc1; font-size: 25px; letter-spacing: 0.08em; }
+.setup-modal form > p { color: #928572; font-size: 10px; line-height: 1.8; }
+.setup-modal form > .identity-lock-note { padding: 8px 10px; border-left: 2px solid var(--gold); color: #b7a98e; }
+.setup-modal form > label { display: grid; grid-template-columns: 64px 1fr; align-items: center; gap: 10px; margin-top: 12px; color: #a7977b; font-size: 11px; }
+.setup-modal input[type="text"], .setup-modal input:not([type]) { min-width: 0; }
+.setup-modal input#kingdomInput, .setup-modal input#rulerInput {
+  width: 100%;
+  padding: 9px 11px;
+  color: #e5d8bd;
+  background: rgba(7, 6, 5, 0.35);
+  border: 1px solid var(--border);
+  border-radius: 0;
+}
+.setup-modal fieldset { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 18px 0 0; padding: 14px 0 0; border: 0; border-top: 1px solid var(--border); }
+.setup-modal legend { padding: 0 9px 0 0; color: var(--gold); font-size: 9px; letter-spacing: 0.2em; }
+.choice { cursor: pointer; }
+.choice input { position: absolute; opacity: 0; }
+.choice span { display: block; padding: 10px; border: 1px solid var(--border); background: rgba(0, 0, 0, 0.14); }
+.choice b, .choice small { display: block; }
+.choice b { color: #d8c9a9; font-size: 12px; }
+.choice small { margin-top: 3px; color: #756b5a; font-size: 7px; }
+.choice input:checked + span { border-color: var(--gold); background: rgba(139, 91, 39, 0.14); box-shadow: inset 0 -2px var(--gold); }
+.begin-button { margin-top: 20px; }
+.save-disclaimer { display: block; margin-top: 8px; color: #655d50; text-align: center; font-size: 7px; }
+
+.modal-close {
+  position: absolute;
+  top: 11px;
+  right: 12px;
+  width: 30px;
+  height: 30px;
+  border: 0;
+  background: transparent;
+  color: #8f816c;
+  cursor: pointer;
+  font-size: 20px;
+}
+
+.battle-modal { width: min(570px, calc(100% - 30px)); }
+.battle-modal form, .event-modal form, .help-modal form { position: relative; padding: 30px 34px; }
+.versus { display: grid; grid-template-columns: 1fr auto 1fr; gap: 14px; align-items: center; margin: 20px 0; padding: 15px; background: rgba(0, 0, 0, 0.18); border: 1px solid var(--border); text-align: center; }
+.versus small, .versus strong { display: block; }
+.versus small { color: #796f5f; font-size: 8px; }
+.versus strong { margin-top: 4px; color: #e1d2b3; font-size: 20px; }
+.versus > span { color: var(--red-bright); font-size: 11px; }
+.range-label, .odds-row { display: flex; justify-content: space-between; align-items: center; font-size: 10px; }
+.range-label span, .odds-row span { color: #8d826e; }
+.range-label strong { color: var(--gold-bright); }
+.battle-modal input[type="range"] { width: 100%; margin: 10px 0; accent-color: var(--red-bright); }
+.dispatch-breakdown { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; }
+.dispatch-breakdown span { padding: 7px 5px; color: #8c826f; background: rgba(0, 0, 0, 0.16); border: 1px solid var(--border); text-align: center; font-size: 8px; }
+.odds-row { margin-top: 14px; padding: 11px 0; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+.odds-row strong { color: #9fbb9e; }
+.battle-warning { color: #7a6f5e; font-size: 8px; line-height: 1.6; }
+.campaign-phase { margin: 10px 0 -8px; padding: 7px 10px; color: #d7b472; background: rgba(145, 91, 40, .1); border-left: 2px solid var(--gold); font-size: 9px; letter-spacing: .12em; }
+.tactic-picker { display: grid; grid-template-columns: repeat(3, 1fr); gap: 7px; margin: 14px 0 0; padding: 12px 0 0; border: 0; border-top: 1px solid var(--border); }
+.tactic-picker legend { padding-right: 8px; color: #8f826e; font-size: 8px; }
+.tactic-picker label { cursor: pointer; }
+.tactic-picker input { position: absolute; opacity: 0; }
+.tactic-picker span { display: block; min-height: 58px; padding: 9px; border: 1px solid var(--border); background: rgba(0,0,0,.12); }
+.tactic-picker b, .tactic-picker small { display: block; }
+.tactic-picker b { color: #d4c5a7; font-size: 9px; }
+.tactic-picker small { margin-top: 4px; color: #746b5c; font-size: 7px; line-height: 1.4; }
+.tactic-picker input:checked + span { border-color: var(--gold); background: rgba(144, 91, 38, .16); box-shadow: inset 0 -2px var(--gold); }
+.tactic-picker input:disabled + span { opacity: .35; cursor: not-allowed; }
+
+.event-modal { width: min(460px, calc(100% - 30px)); text-align: center; }
+.event-emblem { display: grid; place-items: center; width: 50px; height: 55px; margin: 0 auto 13px; color: #ead8b0; background: #743027; border: 2px solid #ad6356; font-family: "Ma Shan Zheng", cursive; font-size: 25px; transform: rotate(-2deg); }
+.event-modal form > p { color: #968a75; font-size: 10px; line-height: 1.8; }
+.event-choices { display: flex; flex-direction: column; gap: 8px; margin-top: 18px; }
+.event-choice { display: grid; grid-template-columns: 1fr auto; gap: 4px; padding: 11px 13px; text-align: left; border: 1px solid var(--border); background: rgba(56, 44, 31, 0.48); cursor: pointer; }
+.event-choice b { color: #e0d1b2; font-size: 10px; }
+.event-choice small { grid-row: 2; color: #766d5e; font-size: 8px; }
+.event-choice em { grid-row: 1 / 3; align-self: center; color: var(--gold); font-size: 8px; font-style: normal; }
+.event-choice:hover { border-color: var(--gold); }
+.event-choice:disabled { opacity: 0.4; cursor: not-allowed; }
+
+.result-modal { width: min(580px, calc(100% - 30px)); text-align: center; overflow: hidden; }
+.result-content { position: relative; padding: 39px; background: radial-gradient(circle at center top, rgba(180, 128, 52, 0.18), transparent 60%); }
+.result-rays { position: absolute; inset: -200px; opacity: 0.05; background: repeating-conic-gradient(from 0deg, var(--gold) 0 8deg, transparent 8deg 17deg); animation: spin 50s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.result-seal { position: relative; display: grid; place-items: center; width: 72px; height: 78px; margin: 0 auto 15px; color: #edd9ab; background: #8d3327; border: 3px double #d1816e; font-family: "Ma Shan Zheng", cursive; font-size: 38px; }
+.result-content h1 { margin: 5px 0 10px; color: #f2e3c1; font-size: 32px; letter-spacing: 0.18em; }
+.result-content > p { color: #9f927b; font-size: 11px; line-height: 1.8; }
+.result-stats { display: grid; grid-template-columns: repeat(3, 1fr); margin: 20px 0; border: 1px solid var(--border); }
+.result-stats div { padding: 10px; border-right: 1px solid var(--border); }
+.result-stats div:last-child { border: 0; }
+.result-stats small, .result-stats strong { display: block; }
+.result-stats small { color: #756b5c; font-size: 8px; }
+.result-stats strong { color: var(--gold-bright); font-size: 18px; margin-top: 4px; }
+
+.help-modal { width: min(500px, calc(100% - 30px)); }
+.help-modal ol { list-style: none; counter-reset: help; padding: 0; margin: 20px 0; }
+.help-modal li { counter-increment: help; display: grid; grid-template-columns: 30px 50px 1fr; gap: 8px; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--border); }
+.help-modal li::before { content: counter(help); display: grid; place-items: center; width: 23px; height: 23px; color: var(--gold); border: 1px solid var(--border-strong); font-size: 9px; }
+.help-modal li b { color: #dcccaa; font-size: 11px; }
+.help-modal li span { color: #887d69; font-size: 9px; line-height: 1.6; }
+
+.cloud-modal { width: min(520px, calc(100% - 30px)); }
+.cloud-modal form { position: relative; padding: 30px 34px; }
+.cloud-state {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 17px 0;
+  padding: 11px 13px;
+  background: rgba(49, 47, 39, .62);
+  border: 1px solid rgba(195, 160, 92, .2);
+}
+.cloud-state span, .cloud-state b, .cloud-state small { display: block; }
+.cloud-state b { color: #d9c49b; font-size: 10px; }
+.cloud-state small { margin-top: 3px; color: #837865; font-size: 8px; }
+.cloud-code-label { display: block; margin: 13px 0 6px; color: #a89675; font-size: 9px; }
+.cloud-code-row { display: grid; grid-template-columns: 1fr auto; gap: 7px; }
+.cloud-code-row input {
+  min-width: 0;
+  padding: 10px;
+  color: #e2d2ae;
+  background: #171815;
+  border: 1px solid #5d523f;
+  font: 9px/1.3 ui-monospace, SFMono-Regular, Menlo, monospace;
+  letter-spacing: .03em;
+}
+.cloud-code-row button,
+.danger-action {
+  padding: 0 13px;
+  color: #d8c291;
+  background: #39352c;
+  border: 1px solid #675a43;
+  cursor: pointer;
+  font-size: 9px;
+}
+.cloud-warning { margin: 8px 0 15px; color: #766d5e; font-size: 8px; line-height: 1.65; }
+.cloud-actions { display: grid; grid-template-columns: 1fr auto; gap: 8px; margin-top: 20px; }
+.cloud-actions .primary-action { margin: 0; }
+.cloud-actions .danger-action { color: #bf7668; border-color: rgba(154, 68, 55, .55); background: rgba(78, 31, 26, .42); }
+.cloud-actions button:disabled { opacity: .45; cursor: wait; }
+.help-tip { padding: 9px; color: #9c927e; background: rgba(145, 101, 42, 0.09); border-left: 2px solid var(--gold); font-size: 8px; }
+
+@media (max-width: 1180px) {
+  .game-shell { grid-template-columns: 190px minmax(550px, 1fr) 240px; }
+  .resource { padding: 10px 11px; }
+  .stage { padding: 20px 16px; }
+  .map-and-detail { grid-template-columns: 1fr; }
+  .province-card { position: static; display: grid; grid-template-columns: 1fr 1fr; gap: 0 14px; min-height: 0; }
+  .province-card > .province-banner { grid-column: 1; grid-row: 1 / 3; }
+  .province-card > p { grid-column: 1; grid-row: 3; }
+  .province-card > .province-stats { grid-column: 2; grid-row: 1; }
+  .province-card > .controller-row { grid-column: 2; grid-row: 2; align-self: end; }
+  .province-card > .province-assets { grid-column: 1 / 3; grid-row: 4; }
+  .province-card > .region-meta-grid { grid-column: 1 / 3; grid-row: 5; }
+  .province-card > .campaign-strip { grid-column: 2; grid-row: 3; }
+  .province-card > .primary-action { grid-column: 2; grid-row: 6; }
+  .province-card > .adjacency-note { grid-column: 1 / 3; grid-row: 7; }
+}
+
+@media (max-width: 940px) {
+  .topbar { grid-template-columns: 1fr auto; padding: 0 16px; }
+  .era-block { display: none; }
+  .resource-bar { padding: 0 12px; overflow-x: auto; grid-template-columns: repeat(5, minmax(150px, 1fr)); }
+  .game-shell { display: block; }
+  .left-rail { position: sticky; top: 74px; z-index: 35; display: grid; grid-template-columns: 1fr 2fr; gap: 10px; padding: 8px 12px; border: 0; background: rgba(17, 14, 11, 0.96); }
+  .ruler-card, .campaign-goal { display: none; }
+  .main-nav { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(3, 1fr); margin: 0; }
+  .nav-item { grid-template-columns: 28px 1fr; padding: 8px; }
+  .nav-item small { display: none; }
+  .right-rail { display: grid; grid-template-columns: 1fr 1fr; border: 0; border-top: 1px solid var(--border); }
+  .chronicle { grid-row: span 2; max-height: 260px; }
+  .autosave-note { display: none; }
+}
+
+@media (max-width: 650px) {
+  .topbar { height: 60px; }
+  .brand strong { font-size: 16px; }
+  .brand small { display: none; }
+  .brand-seal { width: 35px; height: 35px; }
+  .text-button { padding: 7px; font-size: 10px; }
+  .resource-bar { min-height: 56px; grid-template-columns: repeat(5, minmax(125px, 1fr)); }
+  .resource { padding: 7px 10px; }
+  .resource-icon { width: 26px; height: 26px; }
+  .resource strong { font-size: 14px; }
+  .left-rail { top: 60px; }
+  .stage { padding: 15px 10px 20px; }
+  .stage-heading { margin-bottom: 10px; }
+  .stage-heading h1 { font-size: 19px; }
+  .legend { display: none; }
+  .map-frame { min-height: auto; padding: 5px; }
+  .map-frame { min-height: 440px; }
+  .map-frame svg { min-height: 430px; }
+  .province-card { display: block; }
+  .province-stats, .province-assets, .region-meta-grid, .controller-row, .campaign-strip, .province-card .primary-action, .adjacency-note { grid-column: auto; grid-row: auto; }
+  .map-key small { display: none; }
+  .action-grid { grid-template-columns: 1fr; }
+  .court-action { min-height: 93px; }
+  .policy-summary { grid-template-columns: repeat(2, 1fr); }
+  .policy-summary > div:first-child { grid-column: 1 / -1; }
+  .policy-stat { border-left: 0; border-top: 1px solid var(--border); }
+  .army-overview { grid-template-columns: 1fr; }
+  .unit-card { display: grid; grid-template-columns: 65px 1fr 1fr; text-align: left; align-items: center; gap: 4px 12px; }
+  .unit-icon { grid-row: 1 / 6; margin: 0; }
+  .unit-card > small, .unit-card h2, .unit-card > strong, .unit-card p { grid-column: 2; }
+  .unit-card h2 { grid-row: 2; }
+  .unit-card > strong { grid-column: 3; grid-row: 1 / 3; text-align: right; }
+  .unit-card button { grid-column: 2 / 4; }
+  .unit-card em { grid-column: 2 / 4; }
+  .military-orders { grid-template-columns: 1fr; }
+  .frontier-list { grid-template-columns: 1fr 1fr; }
+  .right-rail { grid-template-columns: 1fr; padding: 14px 10px; }
+  .chronicle { grid-row: auto; }
+  .setup-modal form { padding: 28px 22px 22px; }
+  .setup-modal fieldset { grid-template-columns: 1fr; }
+  .tactic-picker { grid-template-columns: 1fr; }
+  .setup-modal form > label { grid-template-columns: 52px 1fr; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { scroll-behavior: auto !important; animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
+}
+
+/* 大战略界面：地图是唯一主舞台，管理系统以抽屉覆盖。 */
+body {
+  height: 100vh;
+  overflow: hidden;
+  background: #0b0e0d;
+}
+
+.grand-topbar {
+  height: 62px;
+  grid-template-columns: 220px 1fr 170px;
+  padding: 0 18px;
+  background: linear-gradient(180deg, #171713, #0c0e0c);
+  border-bottom-color: rgba(203, 157, 82, .32);
+}
+
+.grand-topbar .brand-seal { width: 36px; height: 38px; font-size: 23px; }
+.grand-topbar .brand strong { font-size: 16px; }
+.grand-topbar .brand small { font-size: 7px; }
+.grand-topbar .brand { flex-direction: column; align-items: flex-start; gap: 3px; }
+.game-genre { color: var(--paper-dim); font-size: 10px; letter-spacing: .12em; white-space: nowrap; }
+.clock-status { color: var(--gold-bright); font-size: 10px; white-space: nowrap; min-width: 4.5em; }
+.clock-status.running { color: #a7bca7; }
+
+.strategic-clock {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.speed-controls {
+  display: flex;
+  border: 1px solid rgba(197, 158, 87, .26);
+  background: #090b0a;
+}
+
+.speed-controls button {
+  min-width: 34px;
+  height: 28px;
+  padding: 0 7px;
+  color: #7f7767;
+  background: transparent;
+  border: 0;
+  border-right: 1px solid rgba(197, 158, 87, .15);
+  cursor: pointer;
+  font-size: 9px;
+}
+
+.speed-controls button:last-child { border: 0; }
+.speed-controls button:hover { color: #e2c582; background: rgba(164, 63, 43, .18); }
+.speed-controls button.active { color: #f0d592; background: #7d3026; box-shadow: inset 0 -2px #d7a857; }
+
+.resource-bar {
+  position: fixed;
+  z-index: 49;
+  top: 62px;
+  left: 142px;
+  right: 370px;
+  min-height: 52px;
+  grid-template-columns: repeat(6, minmax(102px, 1fr));
+  padding: 0;
+  background: rgba(13, 15, 13, .94);
+  border: 1px solid rgba(198, 157, 82, .18);
+  box-shadow: 0 9px 25px rgba(0,0,0,.34);
+  backdrop-filter: blur(10px);
+}
+
+.resource { min-height: 52px; padding: 6px 10px; }
+.resource-icon { width: 26px; height: 26px; font-size: 11px; }
+.resource strong { font-size: 13px; }
+.resource em { font-size: 6px; }
+
+.game-shell {
+  height: calc(100vh - 62px);
+  width: 100%;
+  max-width: none;
+  grid-template-columns: 142px minmax(0, 1fr) 370px;
+  padding-bottom: 43px;
+}
+
+.left-rail {
+  padding: 14px 9px;
+  background: linear-gradient(180deg, #121411, #0b0d0c);
+  border-right-color: rgba(198, 157, 82, .24);
+}
+
+.left-rail .ruler-card { margin-top: 0; padding: 10px; }
+.ruler-portrait { width: 39px; height: 44px; }
+.ruler-card h2 { font-size: 13px; }
+.ruler-card p { font-size: 7px; }
+.mandate-meter { grid-column: 1 / -1; }
+
+.strategic-nav { margin: 12px -9px; }
+.strategic-nav .nav-item {
+  min-height: 48px;
+  grid-template-columns: 30px 1fr;
+  padding: 8px 12px;
+}
+.strategic-nav .nav-item > span { font-size: 14px; }
+.strategic-nav .nav-item b { font-size: 10px; }
+.strategic-nav .nav-item small { font-size: 7px; }
+.campaign-goal { margin-top: auto; }
+
+.stage {
+  position: relative;
+  height: 100%;
+  padding: 0;
+  overflow: hidden;
+  background: #101616;
+}
+
+#mapView, #mapView.active { display: block; height: 100%; }
+#mapView .stage-heading {
+  position: absolute;
+  z-index: 9;
+  top: 68px;
+  left: 18px;
+  right: 18px;
+  min-height: 42px;
+  margin: 0;
+  padding: 0 0 6px;
+  pointer-events: none;
+  border-bottom-color: rgba(212, 173, 94, .22);
+}
+#mapView .stage-heading .legend { pointer-events: auto; }
+#mapView .stage-heading h1 { font-size: 17px; text-shadow: 0 2px 8px #000; }
+
+.map-and-detail {
+  position: relative;
+  height: 100%;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(300px, 340px);
+  gap: 12px;
+  align-items: stretch;
+}
+.map-frame {
+  height: 100%;
+  min-height: 0;
+  padding: 0;
+  border: 0;
+  background: #0d2228;
+  box-shadow: inset 0 0 90px rgba(0,0,0,.55);
+  overflow: hidden;
+  contain: layout paint;
+}
+
+.map-frame svg {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  max-height: none;
+  object-fit: contain;
+}
+
+.map-physical-canvas {
+  position: absolute;
+  z-index: 0;
+  top: 0;
+  left: 0;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+  transform-origin: 0 0;
+  will-change: transform;
+}
+
+.map-corner { display: none; }
+.map-key { left: 15px; bottom: 14px; }
+.map-stamp { right: 18px; bottom: 16px; opacity: .45; }
+
+.province-card {
+  position: sticky;
+  z-index: 8;
+  top: 68px;
+  align-self: start;
+  width: auto;
+  max-height: calc(100vh - 108px);
+  overflow: auto;
+  display: block;
+  padding: 12px;
+  background: rgba(20, 21, 17, .92);
+  border-color: rgba(210, 171, 94, .34);
+  /* The detail card is a real side drawer; it never occludes the map canvas. */
+  pointer-events: auto;
+}
+.province-card button,
+.province-card input,
+.province-card select,
+.province-card a { pointer-events: auto; }
+.province-card > .province-banner { grid-column: 1; grid-row: 1 / 3; }
+.province-card > p { display: none; }
+.province-card > .province-stats { grid-column: 2; grid-row: 1; margin: 0 0 7px; }
+.province-card > .province-assets { grid-column: 1 / 3; grid-row: 3; }
+.province-card > .controller-row { grid-column: 2; grid-row: 2; }
+.province-card > .region-meta-grid { grid-column: 1 / 3; grid-row: 4; }
+.province-card > .campaign-strip { grid-column: 1 / 3; grid-row: 5; margin-top: 7px; }
+.province-card > .primary-action { grid-column: 2; grid-row: 6; margin-top: 8px; }
+.province-card > .adjacency-note { grid-column: 1; grid-row: 6; align-self: center; margin: 7px 0 0; }
+
+@media (max-width: 1180px) {
+  .map-and-detail { display: block; }
+  .map-and-detail .province-card {
+    position: absolute;
+    top: auto;
+    right: 14px;
+    bottom: 48px;
+    left: 14px;
+    width: auto;
+    max-height: min(42vh, 360px);
+  }
+}
+.province-banner { padding-bottom: 7px; }
+.province-banner > span { width: 37px; height: 41px; font-size: 22px; }
+.province-banner h2 { font-size: 15px; }
+.province-stats div { padding: 5px 2px; }
+.province-assets > span { padding: 4px 6px; }
+.province-assets b { width: 22px; height: 22px; }
+
+.stage > .view:not(#mapView) {
+  position: absolute;
+  z-index: 30;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: min(430px, 95%);
+  display: block;
+  padding: 78px 18px 22px;
+  overflow-y: auto;
+  background: linear-gradient(100deg, rgba(16,17,14,.99), rgba(23,22,17,.97));
+  border-right: 1px solid rgba(207, 169, 91, .32);
+  box-shadow: 20px 0 45px rgba(0,0,0,.48);
+  transform: translateX(-104%);
+  opacity: 0;
+  pointer-events: none;
+  transition: transform .25s ease, opacity .2s;
+}
+
+.stage > .view:not(#mapView).active { transform: none; opacity: 1; pointer-events: auto; }
+.stage > .view:not(#mapView) .stage-heading { align-items: center; }
+.drawer-close {
+  margin-left: auto;
+  width: 29px;
+  height: 29px;
+  color: #91826b;
+  background: #191714;
+  border: 1px solid var(--border);
+  cursor: pointer;
+}
+
+.right-rail {
+  gap: 9px;
+  padding: 12px 10px 55px;
+  overflow-y: auto;
+  background: linear-gradient(180deg, #111310, #0b0d0c);
+  border-left-color: rgba(198,157,82,.24);
+}
+
+.right-rail .season-card, .right-rail .advisor-card { display: none; }
+.chronicle { min-height: 140px; max-height: 230px; padding: 11px; }
+.army-command, .war-overview { padding: 11px; }
+.chronicle-title h2 { font-size: 12px; }
+.chronicle-title > span { color: #897a61; font-size: 8px; }
+.army-list, .war-list { display: flex; flex-direction: column; gap: 7px; margin-top: 9px; }
+
+.army-card {
+  position: relative;
+  display: grid;
+  grid-template-columns: 36px 1fr auto;
+  gap: 7px;
+  align-items: center;
+  padding: 8px;
+  color: #d7c9aa;
+  background: rgba(52,49,39,.62);
+  border: 1px solid rgba(203,168,96,.18);
+  cursor: pointer;
+  text-align: left;
+}
+.army-card:hover, .army-card.selected { border-color: #cfad66; background: rgba(106,58,39,.55); }
+.army-card .army-flag { display: grid; place-items: center; width: 30px; height: 34px; color: #f0d9a6; background: #81372b; clip-path: polygon(0 0, 100% 0, 100% 76%, 50% 100%, 0 76%); font-size: 13px; }
+.army-card b, .army-card small, .army-card em { display: block; }
+.army-card b { font-size: 9px; }
+.army-card small { margin-top: 2px; color: #817562; font-size: 7px; }
+.army-card strong { color: #ddb96d; font-size: 10px; }
+.army-card em { grid-column: 2 / 4; color: #8d8069; font-size: 7px; font-style: normal; }
+.army-card .mini-bar { grid-column: 2 / 4; height: 3px; background: #302b22; }
+.army-card .mini-bar i { display: block; height: 100%; background: #879b6d; }
+
+.war-entry { padding: 8px; background: rgba(57,33,27,.55); border-left: 2px solid #a84936; }
+.war-entry b, .war-entry span { display: block; }
+.war-entry b { color: #d9c29d; font-size: 9px; }
+.war-entry span { margin-top: 3px; color: #8c7763; font-size: 7px; line-height: 1.4; }
+.war-empty { color: #6d6558; font-size: 8px; padding: 5px 0; }
+.alert-dot { width: 7px; height: 7px; border-radius: 50%; background: #6f6657; }
+.alert-dot.active { background: #d04d37; box-shadow: 0 0 8px #e46148; }
+.end-turn { padding: 9px 12px; }
+.autosave-note { margin: 0; }
+
+.map-mode-bar {
+  position: fixed;
+  z-index: 60;
+  left: 142px;
+  right: 370px;
+  bottom: 0;
+  height: 43px;
+  display: flex;
+  align-items: stretch;
+  background: #0a0c0b;
+  border-top: 1px solid rgba(204,168,94,.3);
+  box-shadow: 0 -8px 24px rgba(0,0,0,.36);
+}
+.map-mode-bar > span, .map-mode-bar button, .map-mode-bar em { display: flex; align-items: center; }
+.map-mode-bar > span { padding: 0 14px; color: #756b59; font-size: 8px; border-right: 1px solid var(--border); }
+.map-mode-bar button { padding: 0 15px; color: #817664; background: transparent; border: 0; border-right: 1px solid rgba(204,168,94,.11); cursor: pointer; font-size: 9px; }
+.map-mode-bar button:hover { color: #e2c887; }
+.map-mode-bar button.active { color: #f0d48f; background: #762f25; box-shadow: inset 0 3px #cf9f50; }
+.map-mode-bar em { margin-left: auto; padding: 0 13px; color: #6e6557; font-size: 7px; font-style: normal; }
+
+.order-hint {
+  position: absolute;
+  z-index: 12;
+  left: 12px;
+  bottom: 44px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  max-width: calc(100% - 24px);
+  flex-wrap: wrap;
+  padding: 8px 11px;
+  color: #dac8a2;
+  background: rgba(31,25,19,.94);
+  border: 1px solid #bd9851;
+  font-size: 11px;
+}
+.order-hint span { color: #90836e; }
+.order-hint button { color: #b99f72; background: transparent; border: 1px solid #665a46; cursor: pointer; font-size: 10px; padding: 4px 6px; }
+
+.map-context-action {
+  position: absolute;
+  z-index: 18;
+  right: 18px;
+  bottom: 65px;
+  width: 245px;
+  padding: 11px;
+  color: #cbbb9c;
+  background: rgba(20,18,14,.97);
+  border: 1px solid #c4974f;
+  box-shadow: 0 14px 34px rgba(0,0,0,.55);
+}
+.map-context-action small,
+.map-context-action strong,
+.map-context-action span { display: block; }
+.map-context-action small { color: #8d8069; font-size: 8px; }
+.map-context-action strong { margin-top: 4px; color: #f0d69a; font-size: 13px; }
+.map-context-action span { margin: 6px 0 9px; color: #9e927b; font-size: 9px; line-height: 1.5; }
+.map-context-action div { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 5px; }
+.map-context-action button { padding: 6px; color: #d8c49d; background: #30291f; border: 1px solid #75613d; cursor: pointer; font-size: 8px; }
+.map-context-action button:first-child { color: #fff0bd; background: #7a3329; border-color: #c06a55; }
+
+/* V2 command surface: the right rail is the persistent plan board.  It
+   keeps the map readable while giving every selected/in-flight army its own
+   route, target, ETA and supply row. */
+.battle-plan { flex: 0 0 auto; padding: 11px; border-color: rgba(201, 157, 77, .48); }
+.battle-plan-heading { display: grid; grid-template-columns: 1fr auto auto; align-items: center; gap: 7px; }
+.battle-plan-heading h2 { margin: 2px 0 0; color: #ead39b; font-size: 14px; }
+.battle-plan-heading > span { color: #c66d55; font-size: 8px; white-space: nowrap; }
+.battle-plan-heading button { padding: 4px 6px; color: #b7a176; background: transparent; border: 1px solid rgba(196, 157, 83, .35); cursor: pointer; font-size: 8px; }
+.battle-plan-selection { margin: 9px 0 7px; padding: 7px 8px; color: #ddc891; background: rgba(107, 60, 39, .35); border-left: 2px solid #bd614b; font-size: 9px; }
+.battle-plan-target { padding: 8px; background: rgba(31, 28, 22, .76); border: 1px solid rgba(196, 157, 83, .33); }
+.battle-plan-target small, .battle-plan-target strong, .battle-plan-target > span { display: block; }
+.battle-plan-target small { color: #8d8069; font-size: 8px; }
+.battle-plan-target strong { margin-top: 3px; color: #f0d69a; font-size: 12px; }
+.battle-plan-target > span { margin: 5px 0 8px; color: #b1a183; font-size: 8px; line-height: 1.45; }
+.battle-plan-coordination { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; margin: 7px 0; }
+.battle-plan-coordination > span { grid-column: 1 / -1; color: #9b8d72; font-size: 8px; }
+.battle-plan-coordination button { padding: 5px 4px; color: #b8a77f; background: #28271f; border: 1px solid rgba(192, 153, 81, .32); cursor: pointer; font-size: 8px; }
+.battle-plan-coordination button.active { color: #fff0be; background: #71372c; border-color: #c16d54; }
+.battle-plan-actions { display: grid; grid-template-columns: 1.25fr 1fr 1fr 1fr; gap: 5px; }
+.battle-plan-actions button { padding: 6px 3px; color: #d5c399; background: #29251d; border: 1px solid #69583b; cursor: pointer; font-size: 8px; }
+.battle-plan-actions button:first-child { color: #fff0c1; background: #7a3329; border-color: #c06a55; }
+.battle-plan-list { display: flex; flex-direction: column; gap: 6px; margin-top: 8px; max-height: 280px; overflow: auto; }
+.battle-plan-empty { color: #837862; font-size: 8px; line-height: 1.5; }
+.battle-plan-card { padding: 7px; background: rgba(45, 42, 34, .62); border: 1px solid rgba(201, 169, 100, .24); }
+.battle-plan-card.selected { border-color: rgba(211, 112, 80, .72); background: rgba(91, 53, 39, .54); }
+.battle-plan-card-head { display: grid; grid-template-columns: 22px 1fr auto; gap: 6px; align-items: center; }
+.battle-plan-route-badge { display: grid; place-items: center; width: 20px; height: 20px; color: #f1d89e; background: #7d352a; border: 1px solid #bd7659; font: 700 10px Georgia, serif; }
+.battle-plan-card-head b { color: #e4ce9b; font-size: 9px; }
+.battle-plan-card-head strong { color: #ddba70; font-size: 9px; }
+.battle-plan-card-meta, .battle-plan-card-route, .battle-plan-card-supply { display: block; margin-top: 4px; color: #a99a7d; font-size: 7px; line-height: 1.4; }
+.battle-plan-card-route { color: #d2b978; }
+.battle-plan-card-supply i { display: inline-block; width: 58px; height: 4px; margin-left: 4px; vertical-align: middle; background: #252a25; border: 1px solid rgba(204, 172, 100, .22); }
+.battle-plan-card-supply i::after { content: ""; display: block; width: var(--supply, 0%); height: 100%; background: #9a7743; }
+.battle-plan-card-edit { margin-top: 5px; padding: 3px 6px; color: #bea875; background: transparent; border: 1px solid rgba(192, 157, 87, .3); cursor: pointer; font-size: 7px; }
+.battle-plan-card-edit:hover { color: #f0d899; border-color: #bd7659; }
+.battle-plan.collapsed #battlePlanBody { display: none; }
+.army-formation { margin: 10px 0; padding: 10px; border-color: rgba(201, 157, 77, .42); }
+.army-formation h2 { margin: 2px 0 0; color: #e7cd94; font-size: 13px; }
+.army-formation p { margin: 8px 0; color: #b6a583; font-size: 8px; }
+.army-formation small { display: block; margin-top: 7px; color: #877a63; font-size: 7px; line-height: 1.5; }
+.formation-button { width: 100%; padding: 7px 8px; color: #f3dfac; background: #63352a; border: 1px solid #ad604b; cursor: pointer; font-size: 9px; }
+.formation-button:hover:not(:disabled) { background: #7a3e30; border-color: #d18862; }
+.formation-button:disabled { color: #766d5c; background: #292720; border-color: #4a4336; cursor: not-allowed; }
+
+.map-tooltip {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 100;
+  width: 210px;
+  padding: 10px;
+  color: #cbbb9c;
+  background: rgba(13,15,13,.96);
+  border: 1px solid #917b50;
+  box-shadow: 0 12px 30px rgba(0,0,0,.48);
+  pointer-events: none;
+  will-change: transform;
+  font-size: 8px;
+  line-height: 1.65;
+}
+.map-tooltip b { display: block; color: #ead7ad; font-size: 11px; }
+.map-tooltip span,
+.map-tooltip strong { display: block; }
+.map-tooltip strong { margin-top: 3px; color: #dfbf78; font-size: 9px; }
+
+.army-marker { cursor: pointer; }
+.army-marker .flag-body { fill: #8f3c2f; stroke: #f0c977; stroke-width: 1.6; vector-effect: non-scaling-stroke; }
+.army-marker.enemy .flag-body { fill: #3f556a; }
+.army-marker text { fill: #fff1c5; text-anchor: middle; font-size: 14px; font-weight: 800; pointer-events: none; }
+.army-marker .army-size { font-size: 12px; fill: #ead4a6; paint-order: stroke; stroke: #18130f; stroke-width: 1.7px; vector-effect: non-scaling-stroke; }
+.army-marker.selected .flag-body { stroke-width: 2.5; stroke: #fff0aa; }
+
+.movement-line { fill: none; stroke: #e7c46f; stroke-width: 3.5; stroke-linecap: round; stroke-dasharray: 13 9; animation: routeMarch .8s linear infinite; vector-effect: non-scaling-stroke; }
+.movement-line.movement-preview { stroke: #d8c182; stroke-width: 1.6; stroke-dasharray: 5 6; opacity: .72; animation: none; }
+.movement-line.enemy { stroke: #c55443; }
+.movement-arrow { fill: #e7c46f; }
+.movement-progress { fill: #fff0b5; stroke: #352718; stroke-width: 1.5; vector-effect: non-scaling-stroke; }
+@keyframes routeMarch { to { stroke-dashoffset: -22; } }
+
+.front-line { stroke: #d05a43; stroke-width: 3; stroke-dasharray: 4 7; fill: none; vector-effect: non-scaling-stroke; }
+.front-line-layer,
+.battle-marker { pointer-events: none; }
+.battle-badge { fill: #21150f; stroke: #e0a75b; stroke-width: 1.5; vector-effect: non-scaling-stroke; }
+.battle-text { fill: #f0d293; text-anchor: middle; font-size: 14px; font-weight: 800; }
+
+body.map-mode-faction .territory > path,
+body.map-mode-diplomacy .territory > path { fill: var(--faction-color, #4f5046); }
+body.map-mode-military .territory > path { fill: #333b3b; }
+body.map-mode-military .territory.player > path { fill: #5f352d; }
+body.map-mode-military .territory.besieged > path { fill: #7b3328; }
+body.map-mode-economy .territory > path { fill: color-mix(in srgb, #75643a var(--mode-strength, 45%), #272c29); }
+body.map-mode-morale .territory > path { fill: color-mix(in srgb, #5d865b var(--mode-strength, 45%), #382827); }
+body.map-mode-grain .territory > path { fill: color-mix(in srgb, #9b843d var(--mode-strength, 45%), #2a2b25); }
+body.map-mode-diplomacy .territory > path { fill-opacity: .3; }
+body.map-mode-diplomacy .territory.player > path { fill-opacity: .62; }
+
+.diplomacy-list, .decision-list { display: flex; flex-direction: column; gap: 9px; }
+.diplomacy-row, .decision-card { padding: 12px; background: rgba(45,42,34,.55); border: 1px solid var(--border); }
+.diplomacy-row { display: grid; grid-template-columns: 12px 1fr auto; align-items: center; gap: 9px; }
+.diplomacy-row i { width: 10px; height: 32px; background: var(--faction-color); }
+.diplomacy-row b, .diplomacy-row small { display: block; }
+.diplomacy-row b { color: #d9caab; font-size: 10px; }
+.diplomacy-row small { color: #786e5e; font-size: 7px; }
+.diplomacy-row strong { color: #bf9d5d; font-size: 8px; }
+.policy-tree { display: flex; flex-direction: column; align-items: center; gap: 25px; padding: 18px 0; }
+.policy-tree::before { content: ""; position: absolute; height: 60px; border-left: 1px solid #806d45; }
+.policy-branches { position: relative; display: grid; grid-template-columns: 1fr 1fr; gap: 30px; }
+.policy-node { min-width: 145px; padding: 13px; color: #aa9a7b; background: #201e19; border: 1px solid #675a43; cursor: pointer; }
+.policy-node b, .policy-node small { display: block; }
+.policy-node b { color: #d4c29c; font-size: 10px; }
+.policy-node small { margin-top: 4px; color: #746956; font-size: 7px; }
+.policy-node.unlocked { background: #49352a; border-color: #bf9651; }
+.decision-card b { display: block; color: #dbc9a4; font-size: 10px; }
+.decision-card p { color: #807463; font-size: 8px; line-height: 1.6; }
+.decision-card button { width: 100%; padding: 8px; color: #dbc49a; background: #672d25; border: 1px solid #9e5743; cursor: pointer; }
+
+@media (max-width: 1050px) {
+  .grand-topbar { grid-template-columns: 170px 1fr 130px; }
+  .resource-bar { left: 150px; right: 240px; }
+  .game-shell { grid-template-columns: 150px minmax(0,1fr) 240px; }
+  .map-mode-bar { left: 150px; right: 240px; }
+  .strategic-nav .nav-item { padding-left: 9px; }
+  .resource { padding: 5px 6px; }
+  .resource-icon { display: none; }
+}
+
+@media (max-width: 780px) {
+  body { overflow: auto; }
+  .grand-topbar { position: sticky; grid-template-columns: 1fr auto; height: 58px; }
+  .strategic-clock { grid-row: 2; position: fixed; top: 58px; left: 0; right: 0; height: 40px; z-index: 60; background: #0d0f0d; }
+  .resource-bar { position: fixed; top: 98px; left: 0; right: 0; grid-template-columns: repeat(6, minmax(105px,1fr)); overflow-x: auto; }
+  .game-shell { height: calc(100vh - 98px); padding-top: 52px; padding-bottom: 43px; grid-template-columns: 66px minmax(580px,1fr); }
+  .left-rail { width: 66px; padding: 5px; }
+  .ruler-card, .campaign-goal { display: none; }
+  .strategic-nav { margin: 0 -5px; }
+  .strategic-nav .nav-item { display: grid; grid-template-columns: 1fr; text-align: center; padding: 8px 2px; }
+  .strategic-nav .nav-item b { font-size: 8px; }
+  .strategic-nav .nav-item small { display: none; }
+  .right-rail { position: fixed; z-index: 55; top: 150px; right: 0; bottom: 43px; width: 320px; transform: translateX(calc(100% - 24px)); transition: transform .2s; }
+  .right-rail:hover, .right-rail:focus-within { transform: none; }
+  /* Contextual army commands must remain clickable above the collapsible
+     right rail on narrow screens; the map itself stays below the rail. */
+  .map-context-action { position: fixed; z-index: 100; right: 28px; bottom: 54px; }
+  .map-frame:has(.map-context-action:not(.hidden)) { position: relative; z-index: 60; }
+  .map-mode-bar { left: 66px; right: 0; overflow-x: auto; }
+  .map-mode-bar em, .map-mode-bar > span { display: none; }
+  .map-mode-bar button { white-space: nowrap; }
+}
+
+/* V3 geographic map engine: projected WGS84/GeoJSON layers, never the old hand map. */
+#worldMap {
+  touch-action: none;
+  user-select: none;
+  cursor: grab;
+  background: transparent;
+  /* Zoom/pan is applied by geo-map.js through rAF.  Never animate the
+     viewport or its children during a wheel/touchpad gesture. */
+  will-change: auto;
+}
+
+#worldMap:active { cursor: grabbing; }
+.map-world { transform-origin: 0 0; will-change: transform; }
+.map-ui { transform-origin: 0 0; }
+#worldMap .map-world,
+#worldMap .map-ui,
+#worldMap .map-world *:not(.movement-line) { transition: none !important; }
+.screen-space-node { transform-box: view-box; }
+.map-label-candidate.label-collided { display: none !important; }
+#worldMap.map-is-interacting path { shape-rendering: optimizeSpeed; }
+#worldMap.map-is-interacting .movement-line { animation-play-state: paused; }
+.graticule-layer path {
+  fill: none;
+  stroke: rgba(151, 179, 174, .1);
+  stroke-width: calc(.55px / var(--zoom-k, 1));
+}
+.land-layer path {
+  fill: #4a4b3d;
+  stroke: rgba(205, 183, 137, .55);
+  stroke-width: calc(.85px / var(--zoom-k, 1));
+}
+.terrain-geo-layer { pointer-events: none; }
+.terrain-geo-layer .terrain-highland {
+  fill: rgba(120, 94, 62, .3);
+  stroke: rgba(188, 155, 101, .24);
+  stroke-width: calc(.55px / var(--zoom-k, 1));
+}
+.terrain-geo-layer .terrain-lowland {
+  fill: rgba(79, 100, 65, .2);
+  stroke: rgba(145, 165, 113, .15);
+  stroke-width: calc(.45px / var(--zoom-k, 1));
+}
+.terrain-geo-labels text,
+.mountain-axis-labels text {
+  fill: rgba(220, 203, 160, .54);
+  font-size: 12px;
+  text-anchor: middle;
+  letter-spacing: .12em;
+  paint-order: stroke;
+  stroke: rgba(22, 20, 15, .9);
+  stroke-width: 1.8px;
+  vector-effect: non-scaling-stroke;
+  pointer-events: none;
+}
+.mountain-axis-layer path {
+  fill: none;
+  stroke: rgba(208, 178, 119, .5);
+  stroke-width: calc(3px / var(--zoom-k, 1));
+  stroke-dasharray: 1 5;
+  stroke-linecap: round;
+}
+.lake-layer path {
+  fill: #1c4149;
+  stroke: rgba(98, 158, 168, .7);
+  stroke-width: calc(.75px / var(--zoom-k, 1));
+  pointer-events: none;
+}
+.river-geo-layer { pointer-events: none; }
+.river-geo-layer path {
+  fill: none;
+  stroke: rgba(77, 142, 153, .66);
+  stroke-width: calc(1.15px / var(--zoom-k, 1));
+  stroke-linecap: round;
+}
+.river-geo-layer .rank-1,
+.river-geo-layer .rank-2,
+.river-geo-layer .rank-3 { stroke-width: calc(2.15px / var(--zoom-k, 1)); stroke: rgba(84, 160, 173, .82); }
+.river-geo-labels text {
+  fill: rgba(121, 193, 203, .85);
+  font-size: 13px;
+  font-style: italic;
+  text-anchor: middle;
+  paint-order: stroke;
+  stroke: #142329;
+  stroke-width: 1.8px;
+  vector-effect: non-scaling-stroke;
+  pointer-events: none;
+}
+
+.outer-polity-layer { pointer-events: none; }
+.outer-polity path {
+  fill: var(--polity-color, #65705c);
+  stroke: var(--polity-color, #65705c);
+  stroke-width: 1.15;
+  stroke-dasharray: 5 5;
+  vector-effect: non-scaling-stroke;
+}
+.outer-polity-label-layer { pointer-events: none; }
+.outer-polity-label text {
+  fill: rgba(222, 206, 170, .78);
+  font-size: 17px;
+  font-weight: 700;
+  text-anchor: middle;
+  paint-order: stroke;
+  stroke: rgba(20, 17, 13, .9);
+  stroke-width: 2px;
+  vector-effect: non-scaling-stroke;
+}
+.outer-polity-label .polity-type { fill: rgba(177, 160, 132, .7); font-size: 11px; font-weight: 400; }
+
+.province-boundary-layer { pointer-events: none; }
+.province-boundary {
+  fill: none;
+  stroke: rgba(241, 211, 143, .72);
+  stroke-width: 1.45px;
+  stroke-dasharray: 7 4;
+  vector-effect: non-scaling-stroke;
+}
+
+.territory-layer .territory > path {
+  fill: var(--faction-color, #58594d);
+  fill-opacity: .43;
+  stroke: rgba(203, 184, 141, .3);
+  stroke-width: .62;
+  vector-effect: non-scaling-stroke;
+  cursor: pointer;
+}
+.territory-layer.has-region-selection .territory > path:not(.selected-region-cell):not(.hover-region-cell) { opacity: .84; }
+.territory-layer .territory > path.hover-region-cell {
+  opacity: 1;
+  fill-opacity: .62;
+  stroke: #ead596;
+  stroke-width: 1.8;
+}
+.territory-layer .territory.player > path[data-region-owner="player"] { fill: #913c31; fill-opacity: .52; stroke: rgba(224, 150, 116, .54); }
+.territory-layer .territory > path.political-frontier-cell:not(.selected-region-cell):not(.hover-region-cell) {
+  stroke: rgba(240, 207, 119, .64);
+  stroke-width: 1.15;
+}
+.territory-layer .territory > path.hover-region-cell { opacity: 1; fill-opacity: .62; stroke: #ead596; stroke-width: 1.8; }
+.territory-layer .territory.selected > path,
+.territory-layer .territory.selected-region-province > path {
+  stroke: rgba(240,207,119,.54);
+  stroke-width: 1;
+  fill-opacity: .52;
+  filter: none;
+}
+.territory-layer .territory > path.selected-region-cell {
+  fill: color-mix(in srgb, var(--faction-color, #7a6a52) 64%, #80c6d8);
+  fill-opacity: .7;
+  stroke: #f2d17c;
+  stroke-width: 2.4;
+  vector-effect: non-scaling-stroke;
+  filter: none;
+  opacity: 1;
+}
+.territory-layer .territory > path.selected-region-cell.hover-region-cell {
+  stroke: #fff0a9;
+  stroke-width: 2.6;
+}
+.territory-layer.army-command-mode .territory > path.unreachable-cell { opacity: .46; }
+.territory-layer.army-command-mode .territory > path.move-target-cell {
+  opacity: 1;
+  fill: #48715a;
+  fill-opacity: .55;
+  stroke: #91d09d;
+  stroke-width: 1.8;
+}
+.territory-layer.army-command-mode .territory > path.attack-target-cell {
+  opacity: 1;
+  fill-opacity: .62;
+  stroke: #e6aa5f;
+  stroke-width: 2.1;
+  stroke-dasharray: 5 3;
+}
+.territory-layer.army-command-mode .territory > path.army-origin-cell { opacity: 1; stroke: #e9ddaf; stroke-width: 1.8; }
+.territory-layer .territory > path.order-target-cell {
+  opacity: 1;
+  stroke: #ffcf72;
+  stroke-width: 2.8;
+  stroke-dasharray: none;
+}
+.territory-layer .territory.attackable > path { stroke-dasharray: 6 4; }
+.territory-layer .territory.besieged > path { stroke: #e26545; stroke-width: 2.2; }
+
+.province-label-layer { pointer-events: none; }
+.province-label text {
+  text-anchor: middle;
+  paint-order: stroke;
+  stroke: rgba(21, 17, 12, .9);
+  stroke-width: 2.2px;
+  vector-effect: non-scaling-stroke;
+}
+.province-label .province-name { fill: rgba(242, 222, 177, .82); font-size: 22px; font-weight: 800; letter-spacing: .14em; }
+.province-label .province-owner { fill: rgba(199, 177, 134, .74); font-size: 12px; }
+
+.world-label-layer { pointer-events: none; }
+.world-empire-label text {
+  fill: rgba(244, 218, 156, .92);
+  font-size: 26px;
+  font-weight: 900;
+  text-anchor: middle;
+  letter-spacing: .28em;
+  paint-order: stroke;
+  stroke: rgba(35, 21, 14, .92);
+  stroke-width: 2.5px;
+  vector-effect: non-scaling-stroke;
+}
+.world-empire-label .world-empire-subtitle { fill: rgba(217, 193, 143, .72); font-size: 12px; font-weight: 500; letter-spacing: .14em; }
+
+.strategic-route { vector-effect: non-scaling-stroke; }
+.strategic-region .region-shape,
+.army-marker .flag-body,
+.movement-line,
+.movement-progress,
+.front-line,
+.battle-badge { vector-effect: non-scaling-stroke; }
+
+#worldMap[data-zoom-level="world"] .route-layer,
+#worldMap[data-zoom-level="world"] .region-layer,
+#worldMap[data-zoom-level="world"] .region-border-layer,
+#worldMap[data-zoom-level="world"] .river-geo-layer .rank-7,
+#worldMap[data-zoom-level="world"] .river-geo-layer .rank-8,
+#worldMap[data-zoom-level="world"] .river-geo-layer .rank-9,
+#worldMap[data-zoom-level="world"] .terrain-geo-labels,
+#worldMap[data-zoom-level="world"] .mountain-axis-labels,
+#worldMap[data-zoom-level="world"] .province-owner,
+#worldMap[data-zoom-level="world"] .province-label-layer { display: none; }
+#worldMap[data-zoom-level="world"] .region-layer * { pointer-events: none !important; }
+#worldMap[data-zoom-level="nation"] .route-layer,
+#worldMap[data-zoom-level="nation"] .region-border:not(.political-border):not(.frontline-border):not(.dao-border),
+#worldMap[data-zoom-level="nation"] .strategic-region:not(.capital):not(.gate):not(.port) { display: none; }
+#worldMap[data-zoom-level="nation"] .strategic-region .region-label { display: block; font-size: 12px; }
+#worldMap[data-zoom-level="region"] .route-layer { display: none; }
+#worldMap[data-zoom-level="region"] .strategic-region .region-label { display: block; font-size: 12px; }
+#worldMap[data-zoom-level="district"] .strategic-region.farm .region-label { display: none; }
+#worldMap[data-zoom-level="district"] .strategic-region:not(.farm) .region-label { display: block; font-size: 14px; }
+#worldMap[data-zoom-level="tactical"] .region-label,
+#worldMap[data-zoom-level="urban"] .region-label,
+#worldMap[data-zoom-level="ultra"] .region-label { display: block; font-size: 13px; }
+#worldMap:not([data-zoom-level="world"]) .world-label-layer,
+#worldMap[data-zoom-level="region"] .outer-polity-label-layer,
+#worldMap[data-zoom-level="district"] .outer-polity-label-layer,
+#worldMap[data-zoom-level="tactical"] .outer-polity-label-layer,
+#worldMap[data-zoom-level="urban"] .outer-polity-label-layer,
+#worldMap[data-zoom-level="ultra"] .outer-polity-label-layer,
+#worldMap[data-zoom-level="region"] .province-label-layer,
+#worldMap[data-zoom-level="district"] .province-label-layer,
+#worldMap[data-zoom-level="tactical"] .province-label-layer,
+#worldMap[data-zoom-level="urban"] .province-label-layer,
+#worldMap[data-zoom-level="ultra"] .province-label-layer,
+#worldMap[data-zoom-level="region"] .terrain-geo-labels,
+#worldMap[data-zoom-level="district"] .terrain-geo-labels,
+#worldMap[data-zoom-level="region"] .mountain-axis-labels,
+#worldMap[data-zoom-level="district"] .mountain-axis-labels,
+#worldMap[data-zoom-level="region"] .river-geo-labels,
+#worldMap[data-zoom-level="district"] .river-geo-labels { display: none; }
+#worldMap[data-zoom-level="tactical"] .route-layer,
+#worldMap[data-zoom-level="urban"] .route-layer,
+#worldMap[data-zoom-level="ultra"] .route-layer { display: block; }
+#worldMap[data-zoom-level="tactical"] .strategic-region.capital .region-label,
+#worldMap[data-zoom-level="urban"] .strategic-region.capital .region-label,
+#worldMap[data-zoom-level="ultra"] .strategic-region.capital .region-label { font-size: 16px; }
+
+.map-controls {
+  position: absolute;
+  z-index: 14;
+  top: 118px;
+  right: 16px;
+  display: grid;
+  grid-template-columns: 34px;
+  gap: 4px;
+  filter: drop-shadow(0 7px 18px rgba(0, 0, 0, .5));
+}
+.map-controls button {
+  width: 34px;
+  height: 31px;
+  color: #e5cf9c;
+  background: rgba(21, 22, 18, .93);
+  border: 1px solid rgba(195, 160, 92, .46);
+  cursor: pointer;
+  font: 700 16px/1 serif;
+}
+.map-controls button:hover { color: #fff0bd; background: #6b3028; }
+.map-controls output {
+  width: 82px;
+  margin-left: -48px;
+  padding: 5px 7px;
+  color: #aa9977;
+  background: rgba(17, 19, 16, .9);
+  border: 1px solid rgba(177, 145, 85, .25);
+  font-size: 7px;
+  text-align: center;
+  white-space: nowrap;
+}
+.map-controls::after {
+  content: "WGS84 · 唐代741";
+  width: 88px;
+  margin-left: -52px;
+  color: rgba(157, 145, 119, .68);
+  font-size: 6px;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.map-attribution {
+  position: absolute;
+  left: 18px;
+  bottom: 42px;
+  z-index: 7;
+  padding: 3px 7px;
+  color: rgba(231, 220, 190, .56);
+  background: rgba(18, 20, 19, .62);
+  border: 1px solid rgba(205, 171, 108, .15);
+  border-radius: 2px;
+  font-size: 9px;
+  letter-spacing: .04em;
+  pointer-events: none;
+}
+
+@media (max-width: 780px) {
+  .map-controls { top: 96px; right: 28px; }
+  .map-key small { display: none; }
+  .province-label .province-name { font-size: 10px; }
+}
+
+/* 古代中国历史舆图 × PC 大战略：只给动态 GeoJSON 图层换皮，不替换地图本体。 */
+#mapView {
+  --atlas-sea: #15343a;
+  --atlas-land: #5b604d;
+  --atlas-ink: #1b2421;
+  --atlas-paper: #c8b78f;
+  --atlas-muted: #91886e;
+  --atlas-border: rgba(207, 184, 133, .54);
+  --atlas-front: #c46b52;
+}
+
+#mapView .map-frame {
+  /* P0: keep the map background a plain ocean base.  The former diagonal
+     texture and stacked gradients could bleed through land/territory when a
+     geographic layer was transparent, making the whole map look blue. */
+  background: #123b43;
+  background-image: none;
+  border: 1px solid rgba(196, 174, 129, .32);
+  box-shadow: inset 0 0 42px rgba(5, 12, 13, .36), inset 0 0 0 1px rgba(224, 201, 151, .07);
+}
+
+#worldMap .land-layer path { fill: #6b6d54; fill-opacity: 1; stroke: rgba(214, 191, 143, .58); stroke-width: 1.1px; }
+#worldMap #graticuleLayer { display: none !important; }
+#worldMap .land-layer,
+#worldMap .terrain-geo-layer,
+#worldMap .territory-layer,
+#worldMap .outer-polity-layer { mix-blend-mode: normal !important; }
+#mapView .map-frame::before,
+#mapView .map-frame::after { content: none !important; display: none !important; background: none !important; }
+
+/* Optional ?debugLayers=1 inspection switches.  They only toggle already
+   mounted layers and never change the map projection or create a second map. */
+#worldMap.debug-hide-physical-land #landLayer,
+#worldMap.debug-hide-terrain #terrainLayer,
+#worldMap.debug-hide-terrain #mountainAxisLayer,
+#worldMap.debug-hide-political-fill #territoryLayer,
+#worldMap.debug-hide-political-fill #outerPolityLayer,
+#worldMap.debug-hide-rivers #riverLayer,
+#worldMap.debug-hide-rivers #lakeLayer,
+#worldMap.debug-hide-borders #regionBorderLayer,
+#worldMap.debug-hide-borders #provinceBoundaryLayer,
+#worldMap.debug-hide-borders #frontLineLayer,
+#worldMap.debug-hide-cities #regionLayer,
+#worldMap.debug-hide-armies #armyLayer,
+#worldMap.debug-hide-labels #terrainLabelLayer,
+#worldMap.debug-hide-labels #mountainLabelLayer,
+#worldMap.debug-hide-labels #outerPolityLabelLayer,
+#worldMap.debug-hide-labels #riverLabelLayer,
+#worldMap.debug-hide-labels #worldLabelLayer,
+#worldMap.debug-hide-labels #provinceLabelLayer,
+#worldMap.debug-hide-labels #regionLayer .region-label { display: none !important; }
+#mapView .map-frame.debug-hide-ocean { background: #1b2927 !important; }
+.map-debug-layers {
+  position: absolute;
+  z-index: 90;
+  top: 12px;
+  left: 14px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+  max-width: min(640px, calc(100% - 28px));
+  padding: 6px 7px;
+  color: #e6d6ad;
+  background: rgba(15, 28, 25, .92);
+  border: 1px solid rgba(205, 174, 111, .46);
+  font: 10px/1.2 ui-monospace, SFMono-Regular, Menlo, monospace;
+  pointer-events: auto;
+}
+.map-debug-layers strong { margin-right: 3px; color: #e9c878; font-size: 10px; }
+.map-debug-layers button {
+  padding: 3px 5px;
+  color: #d9c9a1;
+  background: #213a35;
+  border: 1px solid rgba(205, 174, 111, .32);
+  font: inherit;
+  cursor: pointer;
+}
+.map-debug-layers button[aria-pressed="false"] { color: #8a887d; background: #171e1b; }
+.map-debug-layers button:hover { border-color: #d4b76b; }
+#worldMap .terrain-geo-layer .terrain-highland { fill: rgba(73, 62, 51, .39); stroke: rgba(194, 163, 108, .27); }
+#worldMap .terrain-geo-layer .terrain-lowland { fill: rgba(143, 140, 82, .19); stroke: rgba(176, 176, 119, .16); }
+#worldMap .lake-layer path { fill: #204650; stroke: rgba(115, 165, 172, .58); }
+#worldMap .river-geo-layer path { stroke: rgba(93, 164, 173, .65); }
+#worldMap .river-geo-layer .rank-1,
+#worldMap .river-geo-layer .rank-2,
+#worldMap .river-geo-layer .rank-3 { stroke: rgba(95, 158, 166, .78); }
+
+#worldMap .province-boundary { stroke: rgba(224, 193, 119, .76); stroke-width: 1.45px; stroke-dasharray: 8 5; }
+#worldMap .outer-polity-layer path.outer-polity-zone { fill-opacity: .2; stroke: rgba(188, 163, 112, .52); stroke-width: 1.15px; stroke-dasharray: 4 5; vector-effect: non-scaling-stroke; pointer-events: none; }
+#worldMap .outer-polity-layer path.outer-polity-zone[data-faction-id="tang"] { fill: #b38f4f; fill-opacity: .1; }
+#worldMap .region-border-layer { pointer-events: none; }
+#worldMap .region-border {
+  fill: none;
+  stroke: rgba(192, 180, 142, .18);
+  stroke-width: .8px;
+  vector-effect: non-scaling-stroke;
+}
+#worldMap .region-border.dao-border {
+  stroke: rgba(212, 187, 133, .5);
+  stroke-width: 1.35px;
+  stroke-dasharray: 6 4;
+}
+#worldMap .region-border.political-border {
+  stroke: var(--border-faction-color, #c9a65b);
+  stroke-width: 2.4px;
+  opacity: .86;
+}
+#worldMap .region-border.frontline-border {
+  stroke: #c46751;
+  stroke-width: 4px;
+  stroke-dasharray: 5 4;
+  opacity: .98;
+}
+#worldMap .region-border.outer-region-border { stroke: rgba(198, 177, 130, .34); }
+#worldMap .territory-layer .territory > path { fill: var(--faction-color, #596052); fill-opacity: .48; stroke: color-mix(in srgb, var(--faction-color, #596052) 72%, #d8c28f); stroke-opacity: .42; stroke-width: .56; }
+#worldMap .territory-layer .territory > path[data-region-controller] { fill: var(--faction-color, #596052); }
+#worldMap .territory-layer .territory.player > path[data-region-controller="player"] { fill: var(--faction-color, #a78642); fill-opacity: .56; stroke: color-mix(in srgb, var(--faction-color, #a78642) 72%, #efc07d); }
+#worldMap .territory-layer .territory > path.political-frontier-cell:not(.selected-region-cell):not(.hover-region-cell) {
+  stroke: var(--atlas-front);
+  stroke-width: 1.35;
+  stroke-opacity: .78;
+}
+#worldMap .territory-layer .territory > path.selected-region-cell {
+  fill: color-mix(in srgb, var(--faction-color, #735c49) 48%, #c5a969);
+  fill-opacity: .54;
+  stroke: #e2c778;
+  stroke-width: 2.2;
+}
+#worldMap .territory-layer .territory > path.selected-region-cell.hover-region-cell { stroke: #f0dda0; stroke-width: 2.4; }
+
+/* 远景只保留势力色，州界/前线承担大战略可读性，郡界随 LOD 渐显。 */
+#worldMap[data-zoom-level="world"] .territory-layer .territory > path { fill-opacity: .34; stroke: transparent; }
+#worldMap[data-zoom-level="nation"] .territory-layer .territory > path { fill-opacity: .34; stroke: transparent; }
+#worldMap[data-zoom-level="world"] .province-boundary-layer { display: none; }
+#worldMap[data-zoom-level="nation"] .province-boundary-layer { opacity: .82; }
+#worldMap[data-zoom-level="region"] .province-boundary-layer { opacity: .68; }
+#worldMap[data-zoom-level="region"] .territory-layer .territory > path,
+#worldMap[data-zoom-level="district"] .territory-layer .territory > path,
+#worldMap[data-zoom-level="tactical"] .territory-layer .territory > path,
+#worldMap[data-zoom-level="ultra"] .territory-layer .territory > path { stroke-width: .62; }
+#worldMap[data-zoom-level="world"] .territory-layer .territory > path.political-frontier-cell,
+#worldMap[data-zoom-level="nation"] .territory-layer .territory > path.political-frontier-cell { stroke: var(--atlas-front); stroke-width: 1.15; }
+
+#worldMap .province-label .province-name { fill: rgba(232, 212, 165, .84); font-size: 18px; font-weight: 700; letter-spacing: .12em; }
+#worldMap .province-label .province-owner { fill: rgba(190, 173, 132, .66); font-size: 10px; }
+#worldMap .province-label text { stroke-width: 1.4px; }
+#worldMap .region-label { fill: #d4c398; font-size: 12.5px; font-weight: 600; stroke: rgba(18, 25, 23, .9); stroke-width: 1.25px; }
+#worldMap .strategic-region.capital .region-label { font-size: 14.5px; }
+#worldMap .strategic-region.gate .region-label,
+#worldMap .strategic-region.port .region-label { font-size: 13px; }
+#worldMap .world-empire-label text { fill: rgba(221, 202, 157, .84); font-size: 21px; stroke-width: 1.7px; }
+#worldMap .world-empire-label .world-empire-subtitle { font-size: 10px; }
+#worldMap .outer-polity-label text { fill: rgba(207, 190, 148, .7); font-size: 14px; stroke-width: 1.3px; }
+#worldMap .outer-polity-label .polity-type { font-size: 9px; }
+
+#worldMap .strategic-region .region-shape { stroke-width: 1.35; }
+#worldMap .strategic-region.capital .region-shape { stroke: #d8bd76; stroke-width: 1.8; }
+#worldMap .strategic-region.selected .region-shape { stroke: #e3ca7b; stroke-width: 2.2; }
+#worldMap .region-glyph { fill: #e3cf9b; font-size: 8px; }
+#worldMap .strategic-route { stroke: rgba(196, 178, 135, .18); stroke-width: 1.4; }
+#worldMap .strategic-route.river,
+#worldMap .strategic-route.water { stroke: rgba(92, 151, 159, .45); stroke-width: 2; }
+
+#worldMap .army-marker .flag-pole { fill: none; stroke: rgba(206, 187, 143, .82); stroke-width: 1.1; vector-effect: non-scaling-stroke; }
+#worldMap .army-marker .flag-body { fill: var(--army-color, #7c3d31); stroke: #d3b66f; stroke-width: 1.15; }
+#worldMap .army-marker.enemy .flag-body { fill: var(--army-color, #53636a); }
+#worldMap .army-marker text { font-size: 10px; font-weight: 700; fill: #f0dfb2; }
+#worldMap .army-marker .army-size { font-size: 9px; fill: #dfcb9e; stroke: #15201d; stroke-width: 1.15px; }
+#worldMap .army-marker.army-cluster text { font-size: 9px; }
+#worldMap .army-marker.army-cluster .army-size { font-size: 8px; }
+#worldMap .army-marker.selected .flag-body { stroke: #f0d994; stroke-width: 1.8; }
+#worldMap .movement-line { stroke: #d0ae64; stroke-width: 2.2; stroke-dasharray: 9 7; }
+#worldMap .movement-line.enemy { stroke: #c46751; }
+#worldMap .movement-line.movement-attack { stroke: #c55443; stroke-width: 2.8; stroke-dasharray: 12 8; marker-mid: url(#movement-arrow-attack); marker-end: url(#movement-arrow-attack); }
+#worldMap .movement-line.movement-move { stroke: #d0ae64; stroke-width: 2.2; stroke-dasharray: 10 8; marker-mid: url(#movement-arrow-move); marker-end: url(#movement-arrow-move); }
+#worldMap .movement-line.movement-retreat { stroke: #9d967d; stroke-width: 2; stroke-dasharray: 7 8; marker-mid: url(#movement-arrow-retreat); marker-end: url(#movement-arrow-retreat); }
+#worldMap .movement-line.movement-preview { opacity: .78; animation: none; }
+#worldMap .movement-line.movement-attack.movement-preview { stroke: #ad5546; stroke-width: 2.1; stroke-dasharray: 6 8; }
+#worldMap .movement-line.movement-move.movement-preview { stroke: #b9a26b; stroke-width: 1.7; }
+#worldMap .movement-line.movement-retreat.movement-preview { stroke: #8c8875; stroke-width: 1.6; }
+#worldMap .movement-line.movement-selected { stroke-width: 3.5; opacity: 1; }
+#worldMap .movement-line.movement-variant-1 { stroke-dashoffset: -5; }
+#worldMap .movement-line.movement-variant-2 { stroke-dashoffset: -11; }
+#worldMap marker path { vector-effect: non-scaling-stroke; }
+#worldMap #movement-arrow-attack path { fill: #c55443; }
+#worldMap #movement-arrow-move path { fill: #d0ae64; }
+#worldMap #movement-arrow-retreat path { fill: #9d967d; }
+#worldMap .movement-route-label,
+#worldMap .movement-target-badge { pointer-events: none; paint-order: stroke; }
+#worldMap .movement-route-label text,
+#worldMap .movement-target-badge text { fill: #ecd7a3; font-size: 10px; font-weight: 700; stroke: #16211d; stroke-width: 3px; stroke-linejoin: round; }
+#worldMap .movement-route-label.movement-attack text,
+#worldMap .movement-target-badge.movement-attack text { fill: #f0b29d; }
+#worldMap .movement-route-label.movement-retreat text,
+#worldMap .movement-target-badge.movement-retreat text { fill: #c4bfa9; }
+#worldMap .movement-route-label.selected text { font-size: 11px; }
+#worldMap .movement-target-dot { fill: #c55443; stroke: #f2d39a; stroke-width: 1.3; vector-effect: non-scaling-stroke; }
+#worldMap .movement-target-badge.movement-move .movement-target-dot { fill: #d0ae64; }
+#worldMap .movement-target-badge.movement-retreat .movement-target-dot { fill: #9d967d; }
+#worldMap .front-line { stroke: #c46751; stroke-width: 2.2; stroke-dasharray: 3 6; }
+#worldMap .battle-badge { fill: #1d2724; stroke: #c9985b; stroke-width: 1.1; }
+#worldMap .battle-text { fill: #dec58c; font-size: 11px; }
+
+#mapView .map-controls { filter: none; }
+#mapView .map-controls button { color: #d1be91; background: rgba(21, 39, 36, .94); border-color: rgba(194, 172, 121, .38); }
+#mapView .map-controls button:hover { color: #f0dfb4; background: #29463d; }
+#mapView .map-mode-bar button.active { color: #e0c98f; background: #203a34; box-shadow: inset 0 -2px #b99b5f; }
+#mapView .map-key { color: #c8b891; background: rgba(18, 32, 29, .82); border-color: rgba(194, 170, 119, .26); backdrop-filter: none; }
+#mapView .map-attribution { color: rgba(218, 204, 168, .54); background: rgba(18, 32, 29, .56); border-color: rgba(196, 171, 119, .18); }
+#mapView .map-stamp { color: rgba(178, 83, 64, .64); border-color: rgba(178, 83, 64, .54); opacity: .42; }
+#mapView .legend-siege { box-shadow: none; }
+
+/* P0 profiling mode: query /play?perf=1 to isolate the physical raster and
+   the single interactive 100-region SVG layer. It deliberately removes all
+   labels, markers, overlays and expensive visual effects without changing
+   the underlying map geometry or game state. */
+.perf-mode #mapView .map-ui,
+.perf-mode #mapView #mapUi,
+.perf-mode #mapView .map-controls,
+.perf-mode #mapView .map-key,
+.perf-mode #mapView .map-attribution,
+.perf-mode #mapView .map-stamp,
+.perf-mode #mapView .map-tooltip,
+.perf-mode #mapView .map-context-action,
+.perf-mode #mapView .province-card,
+.perf-mode #mapView .map-mode-bar,
+.perf-mode #mapView .map-legend,
+.perf-mode #mapView .map-physical-canvas:not(#mapPhysicalCanvas) { display: none !important; }
+.perf-mode .topbar,
+.perf-mode .resource-bar,
+.perf-mode .left-rail,
+.perf-mode .right-rail,
+.perf-mode #mapView > .stage-heading,
+.perf-mode #mapView > .province-card { display: none !important; }
+.perf-mode .game-shell,
+.perf-mode .stage,
+.perf-mode #mapView,
+.perf-mode #mapView .map-frame { display: block; width: 100vw; height: 100vh; min-height: 0; padding: 0; margin: 0; }
+.perf-mode #mapView .terrain-geo-layer,
+.perf-mode #mapView .lake-layer,
+.perf-mode #mapView .river-geo-layer,
+.perf-mode #mapView .route-layer,
+.perf-mode #mapView .movement-layer,
+.perf-mode #mapView .outer-polity-layer,
+.perf-mode #mapView .province-boundary-layer,
+.perf-mode #mapView .region-border-layer { display: none !important; }
+.perf-mode #mapView *,
+.perf-mode #mapView *::before,
+.perf-mode #mapView *::after {
+  filter: none !important;
+  backdrop-filter: none !important;
+  transition: none !important;
+  animation: none !important;
+  box-shadow: none !important;
+}
+.perf-mode #mapView #territoryLayer { pointer-events: auto; }
+html.perf-mode,
+html.perf-mode body {
+  background: #102f36 !important;
+  background-image: none !important;
+}
+
+/* Tang atlas palette: the physical canvas supplies old-silk land while the
+   SVG layers supply restrained political ink.  Keep this override scoped to
+   the normal map so perf=1…8 remains a neutral benchmark surface. */
+html:not(.perf-mode) #mapView {
+  --map-paper: #d8ceb5;
+  --map-paper-light: #e4dac2;
+  --map-paper-dark: #bfb397;
+  --sea: #879ba0;
+  --sea-deep: #738b91;
+  --sea-coast: #a4b1ad;
+  --river-major: #647f85;
+  --river-minor: #809598;
+  --tang-main: #a8503f;
+  --tang-hover: #b9614d;
+  --tang-selected: #ca765d;
+  --tang-border: #693b32;
+  --frontline: #802f29;
+  --atlas-ink: #493f35;
+  --atlas-muted: #756b59;
+  --atlas-border: rgba(76, 62, 50, .55);
+  --atlas-front: #802f29;
+}
+
+html:not(.perf-mode) #mapView .map-frame {
+  background: var(--sea);
+  background-image: none;
+  box-shadow: inset 0 0 44px rgba(55, 70, 69, .18), inset 0 0 0 1px rgba(228, 218, 194, .36);
+}
+
+html:not(.perf-mode) #worldMap .land-layer path { fill: var(--map-paper); stroke: rgba(94, 78, 61, .42); }
+html:not(.perf-mode) #worldMap .terrain-geo-layer .terrain-highland { fill: rgba(149, 141, 121, .28); stroke: rgba(91, 78, 61, .22); }
+html:not(.perf-mode) #worldMap .terrain-geo-layer .terrain-lowland { fill: rgba(200, 191, 165, .26); stroke: rgba(124, 110, 86, .14); }
+html:not(.perf-mode) #worldMap .lake-layer path { fill: var(--sea-deep); stroke: rgba(83, 111, 116, .58); }
+html:not(.perf-mode) #worldMap .river-geo-layer path { stroke: var(--river-minor); }
+html:not(.perf-mode) #worldMap .river-geo-layer .rank-1,
+html:not(.perf-mode) #worldMap .river-geo-layer .rank-2,
+html:not(.perf-mode) #worldMap .river-geo-layer .rank-3 { stroke: var(--river-major); }
+
+/* 大唐 reads as one polity. Dao colour differences are intentionally tiny;
+   the player reads the dynasty first and administration second. */
+html:not(.perf-mode) #worldMap .territory-layer .territory.player > path,
+html:not(.perf-mode) #worldMap .territory-layer .territory > path[data-region-controller="player"] {
+  fill: var(--tang-main);
+  fill-opacity: .52;
+  stroke: rgba(105, 59, 50, .38);
+}
+html:not(.perf-mode) #worldMap .territory-layer .territory > path[data-region-controller="player"] { --faction-color: var(--tang-main); }
+html:not(.perf-mode) #worldMap .territory-layer .territory > path.selected-region-cell {
+  fill: var(--tang-selected);
+  fill-opacity: .66;
+  stroke: #d9b56c;
+  stroke-width: 2px;
+}
+html:not(.perf-mode) #worldMap .territory-layer .territory > path.hover-region-cell {
+  fill: var(--tang-hover);
+  fill-opacity: .6;
+  stroke: #c89a4b;
+  stroke-width: 1.6px;
+}
+html:not(.perf-mode) #worldMap .territory-layer .occupation-hatch {
+  display: none;
+  fill: url(#occupationHatch);
+  opacity: .7;
+  pointer-events: none;
+}
+html:not(.perf-mode) #worldMap .territory-layer .occupation-hatch.visible { display: block; }
+
+/* Ink hierarchy: state borders > Dao boundaries > strategic cells. */
+html:not(.perf-mode) #worldMap .outer-polity-layer path.outer-polity-zone {
+  stroke: #493f35;
+  stroke-width: 2px;
+  stroke-dasharray: none;
+  fill-opacity: .16;
+}
+html:not(.perf-mode) #worldMap .province-boundary { stroke: rgba(76, 62, 50, .55); stroke-width: 1.15px; stroke-dasharray: 6 4; }
+html:not(.perf-mode) #worldMap .region-border { stroke: rgba(65, 58, 49, .3); stroke-width: .7px; }
+html:not(.perf-mode) #worldMap .region-border.dao-border { stroke: rgba(76, 62, 50, .55); stroke-width: 1.25px; }
+html:not(.perf-mode) #worldMap .region-border.political-border { stroke: #493f35; stroke-width: 2.3px; opacity: .92; }
+html:not(.perf-mode) #worldMap .region-border.frontline-border { stroke: var(--frontline); stroke-width: 3px; stroke-dasharray: 5 4; }
+
+/* Historical type remains in the map labels; UI numerals stay modern. */
+html:not(.perf-mode) #worldMap .world-empire-label text,
+html:not(.perf-mode) #worldMap .province-label text,
+html:not(.perf-mode) #worldMap .outer-polity-label text,
+html:not(.perf-mode) #worldMap .region-label,
+html:not(.perf-mode) #worldMap .terrain-geo-labels text,
+html:not(.perf-mode) #worldMap .mountain-axis-labels text,
+html:not(.perf-mode) #worldMap .river-geo-labels text {
+  font-family: Georgia, "Songti SC", "STSong", "Noto Serif CJK SC", serif;
+  color: var(--atlas-ink);
+  stroke: rgba(216, 206, 181, .9);
+  stroke-width: 2px;
+}
+html:not(.perf-mode) #worldMap .world-empire-label text { fill: rgba(73, 63, 53, .78); font-size: 24px; letter-spacing: .35em; stroke-width: 1.2px; }
+html:not(.perf-mode) #worldMap .world-empire-label .world-empire-subtitle { fill: rgba(73, 63, 53, .62); font-size: 10px; }
+html:not(.perf-mode) #worldMap .province-label .province-name { fill: rgba(73, 63, 53, .76); font-size: 17px; letter-spacing: .2em; }
+html:not(.perf-mode) #worldMap .province-label .province-owner { fill: rgba(73, 63, 53, .58); font-size: 10px; }
+html:not(.perf-mode) #worldMap .outer-polity-label text { fill: rgba(73, 63, 53, .7); font-size: 14px; stroke-width: 1.2px; }
+html:not(.perf-mode) #worldMap .outer-polity-label .polity-type { fill: rgba(73, 63, 53, .56); font-size: 9px; }
+html:not(.perf-mode) #worldMap .region-label { fill: rgba(73, 63, 53, .76); font-size: 12px; }
+html:not(.perf-mode) #worldMap .river-geo-labels text { fill: #647f85; stroke: rgba(216, 206, 181, .88); font-style: normal; }
+
+html:not(.perf-mode) #mapView .map-controls button {
+  color: #e2d5bc;
+  background: #2e2a25;
+  border-color: rgba(216, 206, 181, .46);
+}
+html:not(.perf-mode) #mapView .map-controls button:hover { color: #f3e8ce; background: #413a31; }
+html:not(.perf-mode) #mapView .map-controls output,
+html:not(.perf-mode) #mapView .map-key,
+html:not(.perf-mode) #mapView .map-attribution {
+  color: rgba(73, 63, 53, .78);
+  background: rgba(228, 218, 194, .84);
+  border-color: rgba(76, 62, 50, .26);
+  backdrop-filter: none;
+}
+html:not(.perf-mode) #mapView .map-controls output { color: #493f35; }
+html:not(.perf-mode) #mapView .map-key small { color: rgba(73, 63, 53, .58); }
+html:not(.perf-mode) #mapView .map-attribution { color: rgba(73, 63, 53, .6); }
+
+html:not(.perf-mode) #mapView .map-mode-bar {
+  background: rgba(46, 42, 37, .96);
+  border-top-color: rgba(216, 206, 181, .3);
+}
+html:not(.perf-mode) #mapView .map-mode-bar button { color: rgba(228, 218, 194, .62); }
+html:not(.perf-mode) #mapView .map-mode-bar button.active { color: #f0ddba; background: #693b32; box-shadow: inset 0 3px #c89a4b; }
+
+/* Map-only performance harness (/play?perf=1..8).  This is a separate
+   document shell; the full game HUD is removed before the game script runs. */
+.map-performance-harness {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  background: #102f36;
+  color: #ead7ad;
+}
+.map-performance-harness .map-frame {
+  position: absolute;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  min-height: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+}
+.map-performance-harness .map-frame svg { width: 100%; height: 100%; min-height: 0; }
+.map-performance-harness .map-controls { z-index: 12; display: flex; }
+.map-performance-harness .map-physical-canvas { z-index: 1; }
+.map-performance-harness #worldMap { z-index: 2; }
+.perf-debug-hud {
+  position: fixed;
+  z-index: 30;
+  top: 12px;
+  left: 14px;
+  max-width: min(760px, calc(100vw - 28px));
+  padding: 9px 11px;
+  border: 1px solid rgba(224, 198, 137, .42);
+  border-radius: 6px;
+  background: rgba(15, 25, 23, .9);
+  box-shadow: 0 5px 18px rgba(0, 0, 0, .24);
+  font: 12px/1.35 ui-monospace, SFMono-Regular, Menlo, monospace;
+  pointer-events: auto;
+}
+.perf-debug-title { display: flex; gap: 12px; align-items: baseline; color: #f1deb1; }
+.perf-debug-title span { color: #a9b097; font-size: 10px; }
+.perf-layer-toggles { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 7px; }
+.perf-layer-toggle {
+  border: 1px solid rgba(207, 178, 113, .48);
+  border-radius: 3px;
+  padding: 3px 7px;
+  background: rgba(34, 57, 48, .9);
+  color: #d5c398;
+  cursor: pointer;
+  font: inherit;
+}
+.perf-layer-toggle[aria-pressed="true"] { background: #8b3e32; color: #fff0c5; }
+.perf-debug-metrics { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 8px; color: #b9c3a8; }
+.perf-metric { display: inline-flex; gap: 4px; align-items: baseline; white-space: nowrap; }
+.perf-metric small { color: #819287; font-size: 9px; }
+.perf-metric strong { color: #e8d39c; font-size: 11px; }
+.perf-map-tooltip {
+  position: fixed;
+  z-index: 40;
+  max-width: 230px;
+  padding: 6px 8px;
+  border: 1px solid rgba(216, 188, 117, .55);
+  border-radius: 4px;
+  background: rgba(15, 27, 24, .94);
+  color: #eedcaf;
+  pointer-events: none;
+  font: 11px/1.45 sans-serif;
+}
+#mapPerformanceHarness #territoryLayer path { cursor: pointer; }
+#mapPerformanceHarness #territoryLayer path.perf-hover-region { opacity: .9; stroke: #e3c779; stroke-width: 1.5; }
+#mapPerformanceHarness #territoryLayer path.perf-selected-region { stroke: #f2d58c; stroke-width: 2.6; fill-opacity: .65; vector-effect: non-scaling-stroke; }
+#mapPerformanceHarness #regionBorderLayer path { vector-effect: non-scaling-stroke; }
+#mapPerformanceHarness #riverLayer path.perf-river { fill: none; stroke: rgba(111, 181, 190, .85); stroke-width: 1.8; vector-effect: non-scaling-stroke; }
+#mapPerformanceHarness .perf-city-dot { fill: #e4c77e; stroke: #2b3b32; stroke-width: 1.2; vector-effect: non-scaling-stroke; }
+#mapPerformanceHarness .perf-capital-dot { fill: #e8d39b; stroke: #a7473c; stroke-width: 1.7; vector-effect: non-scaling-stroke; }
+#mapPerformanceHarness .perf-city-label { fill: #f0dfb4; font-size: 12px; paint-order: stroke; stroke: rgba(12, 25, 23, .85); stroke-width: 3px; vector-effect: non-scaling-stroke; }
+#mapPerformanceHarness .perf-army-flag { fill: #a7473c; stroke: #f0d18c; stroke-width: 1; vector-effect: non-scaling-stroke; }
+#mapPerformanceHarness .perf-army-label { fill: #f0dfb4; font-size: 11px; paint-order: stroke; stroke: rgba(12, 25, 23, .85); stroke-width: 3px; vector-effect: non-scaling-stroke; }
+#mapPerformanceHarness .perf-front-preview { fill: none; stroke: #c86750; stroke-width: 3; stroke-dasharray: 4 6; vector-effect: non-scaling-stroke; marker-end: url(#perfArrow); }
+@media (max-width: 700px) {
+  .perf-debug-hud { right: 12px; max-width: none; }
+  .perf-debug-title span { display: none; }
+  .perf-debug-metrics { gap: 6px; }
+}
+
+/* Final Tang-atlas hierarchy.  The SVG keeps one canonical 100-region hit
+   layer, but only the information appropriate to the current camera tier is
+   painted.  This is intentionally an override block so legacy selectors
+   cannot accidentally re-enable the old spider-web at the world view. */
+/* The frame is the one and only ocean surface.  The persistent SVG and all
+   raster LOD canvases must stay transparent: their transparent pixels reveal
+   this ocean instead of becoming a viewport-sized blue rectangle. */
+html:not(.perf-mode) #mapView .map-frame {
+  background-color: #879ba0;
+  background-image: none;
+}
+html:not(.perf-mode) #worldMap {
+  display: block;
+  width: 100%;
+  height: 100%;
+  background: transparent !important;
+  background-color: transparent !important;
+  background-image: none !important;
+}
+html:not(.perf-mode) #mapView .map-physical-canvas {
+  right: 0;
+  bottom: 0;
+  max-width: none;
+  max-height: none;
+  background: transparent !important;
+  background-color: transparent !important;
+  background-image: none !important;
+}
+
+/* Country silhouettes are the only political geometry at 天下 scale. */
+html:not(.perf-mode) #worldMap[data-zoom-level="world"] #territoryLayer > .territory > path,
+html:not(.perf-mode) #worldMap[data-zoom-level="nation"] #territoryLayer > .territory > path {
+  stroke: none;
+  stroke-width: 0;
+  fill-opacity: .42;
+}
+html:not(.perf-mode) #worldMap[data-zoom-level="world"] #territoryLayer > .territory > path.political-frontier-cell,
+html:not(.perf-mode) #worldMap[data-zoom-level="nation"] #territoryLayer > .territory > path.political-frontier-cell {
+  stroke: none;
+  stroke-width: 0;
+}
+html:not(.perf-mode) #worldMap[data-zoom-level="world"] #regionBorderLayer path,
+html:not(.perf-mode) #worldMap[data-zoom-level="nation"] #regionBorderLayer path:not(.frontline-border) {
+  visibility: hidden;
+}
+html:not(.perf-mode) #worldMap[data-zoom-level="world"] #regionBorderLayer path.political-border,
+html:not(.perf-mode) #worldMap[data-zoom-level="nation"] #regionBorderLayer path.political-border,
+html:not(.perf-mode) #worldMap[data-zoom-level="world"] #regionBorderLayer path.frontline-border { visibility: visible; }
+html:not(.perf-mode) #worldMap[data-zoom-level="world"] #provinceBoundaryLayer { visibility: hidden; }
+html:not(.perf-mode) #worldMap[data-zoom-level="world"] .outer-detail-label,
+html:not(.perf-mode) #worldMap[data-zoom-level="world"] #provinceLabelLayer,
+html:not(.perf-mode) #worldMap[data-zoom-level="world"] #regionLayer .strategic-region,
+html:not(.perf-mode) #worldMap[data-zoom-level="world"] #regionLayer .region-label,
+html:not(.perf-mode) #worldMap[data-zoom-level="world"] .province-label-layer,
+html:not(.perf-mode) #worldMap[data-zoom-level="world"] .province-owner {
+  display: none;
+}
+html:not(.perf-mode) #worldMap[data-zoom-level="world"] #armyLayer .army-marker:not(.army-cluster),
+html:not(.perf-mode) #worldMap[data-zoom-level="world"] .battle-text,
+html:not(.perf-mode) #worldMap[data-zoom-level="world"] .battle-progress,
+html:not(.perf-mode) #worldMap[data-zoom-level="world"] .siege-progress,
+html:not(.perf-mode) #worldMap[data-zoom-level="world"] .movement-route-label {
+  display: none;
+}
+
+/* 帝国视角：十五道和两京出现，战略区只作为低对比度底层。 */
+html:not(.perf-mode) #worldMap[data-zoom-level="nation"] #provinceBoundaryLayer { display: block; opacity: .78; }
+html:not(.perf-mode) #worldMap[data-zoom-level="nation"] #provinceLabelLayer { display: block; }
+html:not(.perf-mode) #worldMap[data-zoom-level="nation"] #territoryLayer > .territory > path { fill-opacity: .38; }
+html:not(.perf-mode) #worldMap[data-zoom-level="nation"] #regionLayer .strategic-region { display: none; }
+html:not(.perf-mode) #worldMap[data-zoom-level="nation"] #regionLayer .strategic-region[data-city-importance="capital"],
+html:not(.perf-mode) #worldMap[data-zoom-level="nation"] #regionLayer .strategic-region[data-city-importance="major"],
+html:not(.perf-mode) #worldMap[data-zoom-level="nation"] #regionLayer .strategic-region.selected { display: block; }
+html:not(.perf-mode) #worldMap[data-zoom-level="nation"] #regionLayer .strategic-region .region-label { display: block; font-size: 12px; }
+/* Nation/Dao names do not need a second, often ambiguous one-character
+   controller caption. Full affiliations remain in the selected-region rail. */
+html:not(.perf-mode) #worldMap[data-zoom-level="nation"] #provinceLabelLayer .province-owner,
+html:not(.perf-mode) #worldMap[data-zoom-level="region"] #provinceLabelLayer .province-owner { display: none; }
+/* Political territory already uses real polygons. Decorative marker halos
+   added crowded colour discs without any strategic information. */
+body.map-mode-faction #worldMap .strategic-region .region-influence,
+body.map-mode-diplomacy #worldMap .strategic-region .region-influence { display: none; }
+
+/* 道域视角：道界清楚、战略区边界很弱，避免重新形成红色网格。 */
+html:not(.perf-mode) #worldMap[data-zoom-level="region"] #provinceBoundaryLayer { display: block; opacity: .72; }
+html:not(.perf-mode) #worldMap[data-zoom-level="region"] #provinceLabelLayer { display: block; }
+html:not(.perf-mode) #worldMap[data-zoom-level="region"] #regionBorderLayer path.region-border { opacity: .3; stroke-width: .55px; }
+/* 4–7× retains Dao/political/front lines, not the full tactical mesh.
+   Keep paths mounted so zoom only changes LOD styles, never geometry. */
+html:not(.perf-mode) #worldMap[data-zoom-level="region"] #regionBorderLayer path.region-border:not(.dao-border):not(.political-border):not(.frontline-border) { visibility: hidden; }
+html:not(.perf-mode) #worldMap[data-zoom-level="region"] #regionBorderLayer path.dao-border { opacity: .7; stroke-width: 1.05px; }
+/* Shared-edge BorderLayer already draws administrative boundaries. Stroking
+   every multipart territory again expands hundreds of expensive SVG stroke
+   layouts at the first LOD change and revives the internal boundary web. */
+html:not(.perf-mode) #worldMap #territoryLayer > .territory > path:not(.selected-region-cell):not(.hover-region-cell):not(.order-target-cell):not(.move-target-cell):not(.attack-target-cell):not(.army-origin-cell) {
+  stroke: none;
+  stroke-width: 0;
+}
+html:not(.perf-mode) #worldMap #territoryLayer > .territory > path.selected-region-cell {
+  stroke: #b68b43;
+  stroke-width: 2.4px;
+  stroke-opacity: 1;
+}
+html:not(.perf-mode) #worldMap #territoryLayer > .territory > path.hover-region-cell:not(.selected-region-cell) {
+  stroke: #b9a36d;
+  stroke-width: 1.6px;
+}
+html:not(.perf-mode) #worldMap[data-zoom-level="region"] #regionLayer .strategic-region:not(.capital):not(.gate):not(.port) { display: none; }
+html:not(.perf-mode) #worldMap[data-zoom-level="region"] #regionLayer .strategic-region:not(.capital):not(.gate):not(.port) .region-label { display: none; }
+html:not(.perf-mode) #worldMap[data-zoom-level="region"] #regionLayer .strategic-region[data-city-importance="major"],
+html:not(.perf-mode) #worldMap[data-zoom-level="region"] #regionLayer .strategic-region.selected { display: block; }
+html:not(.perf-mode) #worldMap[data-zoom-level="region"] #regionLayer .strategic-region[data-city-importance="major"] .region-label,
+html:not(.perf-mode) #worldMap[data-zoom-level="region"] #regionLayer .strategic-region.selected .region-label { display: block; }
+
+/* 7×以上才把完整游戏战略区、路线与军团拆开。 */
+html:not(.perf-mode) #worldMap[data-zoom-level="district"] #regionBorderLayer path.region-border { opacity: .55; stroke-width: .65px; }
+html:not(.perf-mode) #worldMap[data-zoom-level="district"] #territoryLayer > .territory > path,
+html:not(.perf-mode) #worldMap[data-zoom-level="tactical"] #territoryLayer > .territory > path,
+html:not(.perf-mode) #worldMap[data-zoom-level="urban"] #territoryLayer > .territory > path,
+html:not(.perf-mode) #worldMap[data-zoom-level="ultra"] #territoryLayer > .territory > path { stroke-width: .7px; }
+
+/* Historical frontier fallback ranges are clipped to land and kept quiet;
+   they never become large black geometric shapes. */
+html:not(.perf-mode) #worldMap .outer-polity-layer path.outer-polity-zone {
+  fill-opacity: .12;
+  stroke: #51483d;
+  stroke-width: 1.45px;
+  stroke-dasharray: none;
+}
+html:not(.perf-mode) #worldMap[data-zoom-level="region"] .outer-polity-layer path.outer-polity-zone,
+html:not(.perf-mode) #worldMap[data-zoom-level="district"] .outer-polity-layer path.outer-polity-zone,
+html:not(.perf-mode) #worldMap[data-zoom-level="tactical"] .outer-polity-layer path.outer-polity-zone,
+html:not(.perf-mode) #worldMap[data-zoom-level="urban"] .outer-polity-layer path.outer-polity-zone,
+html:not(.perf-mode) #worldMap[data-zoom-level="ultra"] .outer-polity-layer path.outer-polity-zone { stroke-width: 1.15px; }
+
+/* Country/Dao/strategic border ink hierarchy. */
+html:not(.perf-mode) #worldMap .province-boundary { stroke: rgba(87,67,54,.5); stroke-width: 1.05px; }
+html:not(.perf-mode) #worldMap .region-border { stroke: rgba(78,65,54,.2); stroke-width: .65px; }
+html:not(.perf-mode) #worldMap .region-border.dao-border { stroke: rgba(87,67,54,.5); stroke-width: 1.1px; }
+html:not(.perf-mode) #worldMap .region-border.political-border { stroke: #6d4036; stroke-width: 1.9px; opacity: .92; }
+html:not(.perf-mode) #worldMap .region-border.frontline-border { stroke: #802f29; stroke-width: 3px; }
+html:not(.perf-mode) #worldMap .world-empire-label text { font-size: 27px; font-weight: 900; }
+html:not(.perf-mode) #worldMap .outer-polity-label text { font-size: 13px; }
+
+/* Collapsible command rails: the map keeps the freed grid columns instead of
+   leaving a dead gutter when a panel slides away. */
+.panel-rail-toggle {
+  position: absolute;
+  z-index: 4;
+  top: 14px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  width: 40px;
+  height: 32px;
+  padding: 0;
+  color: #e3c982;
+  background: #171712;
+  border: 1px solid rgba(207, 169, 91, .48);
+  cursor: pointer;
+  box-shadow: 0 5px 14px rgba(0, 0, 0, .28);
+}
+.panel-rail-toggle span { font: 700 20px/1 Georgia, serif; }
+.panel-rail-toggle b { display: none; }
+.panel-rail-toggle:hover { color: #fff0bf; border-color: #d7ae60; }
+.panel-rail-toggle-left { right: -20px; }
+.panel-rail-toggle-right { left: -20px; }
+.left-rail, .right-rail { position: relative; transition: transform .24s ease, opacity .18s ease; }
+.game-shell { transition: grid-template-columns .24s ease; }
+.map-and-detail { transition: grid-template-columns .24s ease; }
+
+body.panels-left-collapsed .game-shell {
+  grid-template-columns: 40px minmax(0, 1fr) 370px;
+}
+body.panels-left-collapsed .left-rail {
+  width: 40px;
+  transform: none;
+  padding: 42px 3px 8px;
+  overflow: hidden;
+  z-index: 70;
+  background: #101310;
+}
+body.panels-left-collapsed .left-rail > :not(.panel-rail-toggle) {
+  opacity: 1;
+  pointer-events: auto;
+}
+body.panels-left-collapsed .left-rail .ruler-card,
+body.panels-left-collapsed .left-rail .campaign-goal {
+  display: none;
+}
+body.panels-left-collapsed .left-rail .main-nav { margin: 0; }
+body.panels-left-collapsed .left-rail .nav-item {
+  display: grid;
+  width: 34px;
+  min-height: 34px;
+  grid-template-columns: 1fr;
+  padding: 7px 2px;
+  text-align: center;
+}
+body.panels-left-collapsed .left-rail .nav-item b,
+body.panels-left-collapsed .left-rail .nav-item small { display: none; }
+body.panels-left-collapsed .left-rail .nav-item span { display: block; margin: 0; }
+body.panels-left-collapsed .map-mode-bar { left: 40px; }
+
+body.panels-right-collapsed .game-shell {
+  grid-template-columns: 142px minmax(0, 1fr) 40px;
+}
+body.panels-right-collapsed .right-rail {
+  width: 370px;
+  transform: translateX(calc(100% - 40px));
+  z-index: 70;
+  overflow: visible;
+  background: #101310;
+}
+body.panels-right-collapsed .right-rail > :not(.panel-rail-toggle) {
+  opacity: 0;
+  pointer-events: none;
+}
+body.panels-right-collapsed .map-and-detail { grid-template-columns: minmax(0, 1fr); }
+body.panels-right-collapsed .map-mode-bar { right: 40px; }
+body.panels-right-collapsed .province-card {
+  opacity: 0;
+  pointer-events: none;
+  transform: translateX(calc(100% + 18px));
+}
+
+body.panels-left-collapsed.panels-right-collapsed .game-shell,
+body.panels-all-collapsed .game-shell {
+  grid-template-columns: 40px minmax(0, 1fr) 40px;
+}
+body.panels-all-collapsed .left-rail,
+body.panels-all-collapsed .right-rail {
+  width: 142px;
+}
+body.panels-all-collapsed .left-rail {
+  width: 40px;
+  transform: none;
+  padding: 42px 3px 8px;
+  overflow: hidden;
+  z-index: 70;
+}
+body.panels-all-collapsed .right-rail {
+  width: 370px;
+  transform: translateX(calc(100% - 40px));
+  z-index: 70;
+  overflow: visible;
+}
+body.panels-all-collapsed .left-rail > :not(.panel-rail-toggle) {
+  opacity: 1;
+  pointer-events: auto;
+}
+body.panels-all-collapsed .right-rail > :not(.panel-rail-toggle) {
+  opacity: 0;
+  pointer-events: none;
+}
+body.panels-all-collapsed .left-rail .ruler-card,
+body.panels-all-collapsed .left-rail .campaign-goal { display: none; }
+body.panels-all-collapsed .left-rail .main-nav { margin: 0; }
+body.panels-all-collapsed .left-rail .nav-item {
+  display: grid;
+  width: 34px;
+  min-height: 34px;
+  grid-template-columns: 1fr;
+  padding: 7px 2px;
+  text-align: center;
+}
+body.panels-all-collapsed .left-rail .nav-item b,
+body.panels-all-collapsed .left-rail .nav-item small { display: none; }
+body.panels-all-collapsed .left-rail .nav-item span { display: block; margin: 0; }
+body.panels-all-collapsed .map-and-detail { grid-template-columns: minmax(0, 1fr); }
+body.panels-all-collapsed .province-card {
+  opacity: 0;
+  pointer-events: none;
+  transform: translateX(calc(100% + 18px));
+}
+body.panels-all-collapsed .map-mode-bar {
+  left: 40px;
+  right: 40px;
+  transform: none;
+  opacity: 1;
+  pointer-events: auto;
+}
+body.panels-all-collapsed .game-shell { padding-bottom: 0; height: calc(100vh - 62px); }
+.map-mode-bar { transition: left .24s ease, right .24s ease, transform .24s ease, opacity .18s ease; }
+.province-card { transition: transform .24s ease, opacity .18s ease; }
+.panel-visibility-toggle[aria-pressed="true"] { color: #fff0bf; background: #71372c; border-color: #c9875a; }
+
+@media (max-width: 1180px) {
+  body.panels-left-collapsed .game-shell { grid-template-columns: 40px minmax(0, 1fr) 240px; }
+  body.panels-right-collapsed .game-shell { grid-template-columns: 142px minmax(0, 1fr) 40px; }
+  body.panels-all-collapsed .game-shell,
+  body.panels-left-collapsed.panels-right-collapsed .game-shell { grid-template-columns: 40px minmax(0, 1fr) 40px; }
+}
+
+@media (max-width: 780px) {
+  .panel-rail-toggle { top: 8px; }
+  .left-rail .panel-rail-toggle-left { right: -20px; }
+  .right-rail .panel-rail-toggle-right { left: -20px; }
+  body.panels-left-collapsed .game-shell,
+  body.panels-right-collapsed .game-shell,
+  body.panels-all-collapsed .game-shell { grid-template-columns: 40px minmax(0, 1fr) 40px; }
+  body.panels-left-collapsed .left-rail,
+  body.panels-all-collapsed .left-rail { width: 40px; transform: none; padding: 42px 3px 8px; overflow: hidden; }
+  body.panels-right-collapsed .right-rail,
+  body.panels-all-collapsed .right-rail { width: 320px; transform: translateX(calc(100% - 40px)); }
+  body.panels-all-collapsed .game-shell { padding-bottom: 0; }
+}
+
+/* P0 viewport contract: the shell owns all height below the top bar. The
+   resource strip and map-mode bar are overlays, so neither can create a
+   second layout row or leave a black lower half behind the map. */
+html, body {
+  height: 100%;
+  min-height: 0;
+}
+body {
+  height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.grand-topbar {
+  flex: 0 0 62px;
+  position: relative;
+}
+/* Desktop actions must remain a single horizontal row.  A fixed 170px grid
+   track allowed the flex children to shrink and wrap one Chinese character
+   per line, making the header extend over the right-sidebar tabs. */
+@media (min-width: 781px) {
+  .grand-topbar {
+    grid-template-columns: minmax(150px, 220px) minmax(0, 1fr) max-content;
+  }
+  .top-actions {
+    min-width: max-content;
+    max-height: 62px;
+    flex-wrap: nowrap;
+    white-space: nowrap;
+    overflow: hidden;
+  }
+  .top-actions > * {
+    flex: 0 0 auto;
+    white-space: nowrap;
+  }
+}
+.game-shell {
+  flex: 1 1 auto;
+  height: auto;
+  min-height: 0;
+  padding-bottom: 0;
+  overflow: hidden;
+}
+.stage {
+  height: auto;
+  min-height: 0;
+}
+#mapView, #mapView.active,
+#mapView .map-and-detail,
+#mapView .map-frame {
+  height: 100%;
+  min-height: 0;
+}
+.map-mode-bar {
+  position: fixed;
+  bottom: 0;
+}
+
+@media (max-width: 940px) {
+  /* Keep the map in the available viewport height on compact screens. The old
+     column/scroll fallback pushed the map below the viewport and exposed a
+     large empty stage area. Side information becomes a drawer instead. */
+  .game-shell,
+  body.panels-right-collapsed:not(.panels-left-collapsed) .game-shell {
+    display: grid;
+    grid-template-columns: 66px minmax(0, 1fr) !important;
+    grid-template-rows: minmax(0, 1fr);
+    height: auto;
+    min-height: 0;
+    overflow: hidden;
+  }
+  body.panels-left-collapsed .game-shell,
+  body.panels-left-collapsed.panels-right-collapsed .game-shell,
+  body.panels-all-collapsed .game-shell {
+    grid-template-columns: 40px minmax(0, 1fr) !important;
+  }
+  .left-rail { grid-column: 1; grid-row: 1; min-width: 0; min-height: 0; overflow: auto; }
+  .stage { grid-column: 2; grid-row: 1; width: 100%; height: 100%; min-width: 0; min-height: 0; overflow: hidden; }
+  #mapView, #mapView.active, #mapView .map-and-detail, #mapView .map-frame {
+    width: 100%;
+    height: 100%;
+    min-width: 0;
+    min-height: 0;
+  }
+  .right-rail {
+    position: fixed;
+    z-index: 55;
+    top: 114px;
+    right: 0;
+    bottom: 43px;
+    width: min(320px, calc(100vw - 66px));
+    min-height: 0;
+    transform: translateX(calc(100% - 24px));
+  }
+  .right-rail:hover, .right-rail:focus-within { transform: none; }
+  body.panels-right-collapsed .right-rail,
+  body.panels-all-collapsed .right-rail { transform: translateX(calc(100% - 40px)); }
+}
+
+@media (max-width: 780px) {
+  .right-rail { top: 150px; }
+}
+
+/* Unified right information sidebar.  The map owns the full middle column;
+   region, army, operation and war content are mutually exclusive panes. */
+.map-and-detail {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+}
+.right-rail {
+  min-width: 0;
+  min-height: 0;
+}
+.right-sidebar-tabs {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 3px;
+  padding: 3px;
+  background: rgba(8, 10, 9, .72);
+  border: 1px solid rgba(198, 157, 82, .28);
+}
+.right-sidebar-tabs button {
+  min-width: 0;
+  padding: 7px 3px;
+  color: #9d8f75;
+  background: transparent;
+  border: 1px solid transparent;
+  cursor: pointer;
+  font-size: 9px;
+}
+.right-sidebar-tabs button:hover,
+.right-sidebar-tabs button.active {
+  color: #f1dda8;
+  background: rgba(111, 55, 42, .58);
+  border-color: rgba(207, 158, 84, .58);
+}
+.right-rail > [data-right-pane][hidden] { display: none !important; }
+.right-rail > .province-card {
+  position: relative;
+  top: auto;
+  right: auto;
+  bottom: auto;
+  left: auto;
+  width: auto;
+  max-height: none;
+  min-height: 0;
+  overflow: auto;
+  transform: none;
+  opacity: 1;
+}
+.right-rail > .battle-plan,
+.right-rail > .army-command,
+.right-rail > .war-overview,
+.right-rail > .season-card,
+.right-rail > .advisor-card,
+.right-rail > .chronicle {
+  min-height: 0;
+  max-height: none;
+}
+.right-rail > .battle-plan,
+.right-rail > .army-command,
+.right-rail > .war-overview,
+.right-rail > .chronicle { overflow: auto; }
+.right-rail > .battle-plan { flex: 1 1 auto; }
+.right-rail > .army-command,
+.right-rail > .war-overview,
+.right-rail > .chronicle { flex: 1 1 auto; }
+
+/* Keep the collapsed grid contract authoritative even when the responsive
+   desktop rules above select a narrower layout. */
+body.panels-left-collapsed:not(.panels-right-collapsed) .game-shell {
+  grid-template-columns: 40px minmax(0, 1fr) 370px !important;
+}
+body.panels-right-collapsed:not(.panels-left-collapsed) .game-shell {
+  grid-template-columns: 142px minmax(0, 1fr) 40px !important;
+}
+body.panels-left-collapsed.panels-right-collapsed .game-shell,
+body.panels-all-collapsed .game-shell {
+  grid-template-columns: 40px minmax(0, 1fr) 40px !important;
+}
+
+/* Grid tracks are updated by the panel controller in one frame.  Chromium
+   cannot reliably interpolate minmax()/fr tracks and can leave a permanent
+   zero-time transition (the hidden rail keeps its old 370px column).  The
+   rails themselves still slide with their 240ms transform transition; the
+   map width must settle immediately so hit-testing and ResizeObserver stay
+   correct. */
+.game-shell { transition: none !important; }
+
+/* Re-assert the compact two-column layout after the desktop collapsed-rail
+   rules above. The right rail is a fixed drawer on compact screens and must
+   not reserve its desktop 370px grid track. */
+@media (max-width: 940px) {
+  .game-shell,
+  body.panels-right-collapsed:not(.panels-left-collapsed) .game-shell,
+  body.panels-left-collapsed:not(.panels-right-collapsed) .game-shell,
+  body.panels-left-collapsed.panels-right-collapsed .game-shell,
+  body.panels-all-collapsed .game-shell {
+    grid-template-columns: 66px minmax(0, 1fr) !important;
+  }
+  body.panels-left-collapsed .game-shell,
+  body.panels-left-collapsed.panels-right-collapsed .game-shell,
+  body.panels-all-collapsed .game-shell {
+    grid-template-columns: 40px minmax(0, 1fr) !important;
+  }
+}

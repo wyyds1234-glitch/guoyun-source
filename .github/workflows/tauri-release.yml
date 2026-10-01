@@ -1,0 +1,219 @@
+name: 国运桌面版发布
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "版本标签，例如 v0.1.0"
+        required: true
+        default: "v0.1.0"
+
+concurrency:
+  group: guoyun-desktop-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  build:
+    if: github.repository == 'wyyds1234-glitch/guoyun'
+    permissions:
+      contents: write
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - id: mac_arm64
+            runner: macos-latest
+            target: aarch64-apple-darwin
+            args: "--target aarch64-apple-darwin --bundles dmg"
+          - id: windows_x64
+            runner: windows-latest
+            target: ""
+            args: "--bundles nsis"
+    runs-on: ${{ matrix.runner }}
+    env:
+      RELEASE_VERSION: ${{ inputs.tag || github.ref_name }}
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.target }}
+      - name: Install dependencies
+        run: npm ci
+      - name: Verify and prepare embedded frontend
+        run: |
+          npm run check
+          npm test
+          npm run types:check
+          npm run desktop:prepare
+      - name: Set desktop version from tag
+        shell: bash
+        run: |
+          version="${RELEASE_VERSION#v}"
+          VERSION="$version" node --input-type=module -e 'import { readFileSync, writeFileSync } from "node:fs"; const version=process.env.VERSION; const config=JSON.parse(readFileSync("src-tauri/tauri.conf.json","utf8")); config.version=version; writeFileSync("src-tauri/tauri.conf.json",JSON.stringify(config,null,2)+"\n"); const cargo=readFileSync("src-tauri/Cargo.toml","utf8").replace(/^version = ".*"$/m,`version = "${version}"`); writeFileSync("src-tauri/Cargo.toml",cargo);'
+      - name: Configure optional updater signing
+        id: updater
+        shell: bash
+        env:
+          TAURI_UPDATER_PUBLIC_KEY: ${{ secrets.TAURI_UPDATER_PUBLIC_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+        run: |
+          if [[ -n "$TAURI_UPDATER_PUBLIC_KEY" && -n "$TAURI_SIGNING_PRIVATE_KEY" ]]; then
+            enabled=true
+          else
+            enabled=false
+          fi
+          UPDATER_ENABLED="$enabled" UPDATER_PUBLIC_KEY="$TAURI_UPDATER_PUBLIC_KEY" node --input-type=module -e 'import { readFileSync, writeFileSync } from "node:fs"; const p="src-tauri/tauri.conf.json"; const c=JSON.parse(readFileSync(p,"utf8")); const enabled=process.env.UPDATER_ENABLED === "true"; c.bundle.createUpdaterArtifacts=enabled; if (enabled) c.plugins.updater.pubkey=process.env.UPDATER_PUBLIC_KEY.trim(); writeFileSync(p, JSON.stringify(c,null,2)+"\n");'
+          echo "enabled=$enabled" >> "$GITHUB_OUTPUT"
+      - name: Build Tauri installer
+        uses: tauri-apps/tauri-action@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+        with:
+          projectPath: src-tauri
+          tagName: ${{ env.RELEASE_VERSION }}
+          releaseName: "国运 ${{ env.RELEASE_VERSION }}"
+          releaseBody: "国运桌面版安装包。私有 GitHub Release 仅作构建归档，公开下载由 Cloudflare Pages 静态资产提供。"
+          releaseDraft: false
+          prerelease: false
+          generateReleaseNotes: true
+          args: ${{ matrix.args }}
+          releaseAssetNamePattern: "Guoyun-[arch][ext]"
+          uploadUpdaterJson: ${{ steps.updater.outputs.enabled == 'true' }}
+          uploadUpdaterSignatures: ${{ steps.updater.outputs.enabled == 'true' }}
+      - name: Install and launch Windows package smoke test
+        if: ${{ matrix.id == 'windows_x64' }}
+        shell: pwsh
+        run: |
+          $installer = Get-ChildItem src-tauri/target -Recurse -Filter *.exe | Where-Object { $_.FullName -match '[\\/]bundle[\\/]nsis[\\/]' } | Select-Object -First 1
+          if (!$installer) { throw 'NSIS installer not found' }
+          $installDir = Join-Path $env:RUNNER_TEMP 'GuoyunSmoke'
+          $install = Start-Process $installer.FullName -ArgumentList '/S', "/D=$installDir" -PassThru -Wait
+          if ($install.ExitCode -ne 0) { throw "Installer failed: $($install.ExitCode)" }
+          $app = Get-ChildItem $installDir -Recurse -Filter guoyun.exe | Select-Object -First 1
+          if (!$app) { throw 'Installed guoyun.exe not found' }
+          $process = Start-Process $app.FullName -PassThru
+          Start-Sleep -Seconds 10
+          if ($process.HasExited) { throw "Installed app exited early: $($process.ExitCode)" }
+          Stop-Process -Id $process.Id
+      - name: Verify macOS ad-hoc signed DMG
+        if: ${{ matrix.id == 'mac_arm64' }}
+        shell: bash
+        run: |
+          dmg_path="$(find src-tauri/target -type f -name '*.dmg' | head -n 1)"
+          echo "dmg_path=$dmg_path"
+          test -n "$dmg_path" && test -f "$dmg_path"
+          mount_dir="$(mktemp -d)"
+          hdiutil attach "$dmg_path" -nobrowse -mountpoint "$mount_dir" >/dev/null
+          test -d "$mount_dir/国运.app"
+          test -d "$mount_dir/Applications"
+          app_path="$mount_dir/国运.app"
+          codesign --verify --deep --strict --verbose=2 "$app_path"
+          codesign_info="$(codesign -dv --verbose=4 "$app_path" 2>&1 || true)"
+          echo "$codesign_info"
+          echo "$codesign_info" | grep -q 'Signature=adhoc'
+          hdiutil detach "$mount_dir" >/dev/null
+      - name: Normalize installer filename and write metadata
+        id: installer
+        shell: bash
+        env:
+          INSTALLER_VERSION: ${{ env.RELEASE_VERSION }}
+        run: |
+          version="${INSTALLER_VERSION#v}"
+          if [[ "${{ matrix.id }}" == "mac_arm64" ]]; then
+            source_file="$(find src-tauri/target -type f -path '*/bundle/dmg/*.dmg' | head -n 1)"
+            asset_name="Guoyun-${version}-arm64.dmg"
+            public_path="downloads/mac/${asset_name}"
+          else
+            source_file="$(find src-tauri/target -type f -path '*/bundle/nsis/*.exe' | head -n 1)"
+            asset_name="Guoyun-Setup-${version}.exe"
+            public_path="downloads/windows/${asset_name}"
+          fi
+          test -n "$source_file" && test -f "$source_file"
+          normalized="$RUNNER_TEMP/$asset_name"
+          cp "$source_file" "$normalized"
+          INSTALLER_PATH="$normalized" VERSION="$version" PLATFORM_ID="${{ matrix.id }}" PUBLIC_PATH="$public_path" META_PATH="$RUNNER_TEMP/release-${{ matrix.id }}.json" node --input-type=module -e 'import { statSync, writeFileSync } from "node:fs"; const p=process.env.INSTALLER_PATH; writeFileSync(process.env.META_PATH, JSON.stringify({platform:process.env.PLATFORM_ID,version:process.env.VERSION,asset:process.env.PUBLIC_PATH,size:statSync(p).size},null,2));'
+          echo "path=$normalized" >> "$GITHUB_OUTPUT"
+          echo "meta=$RUNNER_TEMP/release-${{ matrix.id }}.json" >> "$GITHUB_OUTPUT"
+      - name: Upload installer artifact for Pages deployment
+        uses: actions/upload-artifact@v4
+        with:
+          name: guoyun-installer-${{ matrix.id }}
+          path: ${{ steps.installer.outputs.path }}
+          if-no-files-found: error
+      - name: Upload release metadata
+        uses: actions/upload-artifact@v4
+        with:
+          name: guoyun-release-${{ matrix.id }}
+          path: ${{ steps.installer.outputs.meta }}
+          if-no-files-found: error
+
+  publish-manifest:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    env:
+      RELEASE_VERSION: ${{ inputs.tag || github.ref_name }}
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+    steps:
+      - name: Checkout website
+        uses: actions/checkout@v4
+      - name: Download release installers
+        uses: actions/download-artifact@v4
+        with:
+          pattern: guoyun-installer-*
+          path: release-installers
+          merge-multiple: true
+      - name: Prepare public Pages download assets
+        shell: bash
+        run: |
+          version="${RELEASE_VERSION#v}"
+          mac="release-installers/Guoyun-${version}-arm64.dmg"
+          windows="release-installers/Guoyun-Setup-${version}.exe"
+          test -f "$mac" || { echo "::error::macOS DMG 未生成"; exit 1; }
+          test -f "$windows" || { echo "::error::Windows EXE 未生成"; exit 1; }
+          max_bytes=$((25 * 1024 * 1024))
+          mac_size=$(stat -c%s "$mac")
+          windows_size=$(stat -c%s "$windows")
+          test "$mac_size" -le "$max_bytes" || { echo "::error::macOS DMG 超过 Pages 25 MiB 免费资产限制"; exit 1; }
+          test "$windows_size" -le "$max_bytes" || { echo "::error::Windows EXE 超过 Pages 25 MiB 免费资产限制"; exit 1; }
+          mkdir -p release-public/downloads
+          cp "$mac" "release-public/downloads/Guoyun-${version}-arm64.dmg"
+          cp "$windows" "release-public/downloads/Guoyun-Setup-${version}.exe"
+          VERSION="$version" MAC_SIZE="$mac_size" WINDOWS_SIZE="$windows_size" node --input-type=module -e 'import { writeFileSync } from "node:fs"; const version=process.env.VERSION; const mac=`/downloads/Guoyun-${version}-arm64.dmg`; const windows=`/downloads/Guoyun-Setup-${version}.exe`; writeFileSync("release-public/downloads/latest.json", JSON.stringify({version, mac_arm64_url:mac, windows_x64_url:windows, mac_size:Number(process.env.MAC_SIZE), windows_size:Number(process.env.WINDOWS_SIZE), published_at:new Date().toISOString(), platforms:{mac_arm64:{available:true,asset:mac,size:Number(process.env.MAC_SIZE)},windows_x64:{available:true,asset:windows,size:Number(process.env.WINDOWS_SIZE)}}}, null, 2)+"\n");'
+      - name: Commit public installers to main
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          version="${RELEASE_VERSION#v}"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git fetch origin main
+          git checkout -B main origin/main
+          mkdir -p public/downloads
+          cp release-public/downloads/Guoyun-${version}-arm64.dmg public/downloads/
+          cp release-public/downloads/Guoyun-Setup-${version}.exe public/downloads/
+          cp release-public/downloads/latest.json public/downloads/latest.json
+          git add public/downloads
+          git commit -m "build(release): publish Guoyun ${version} installers" || true
+          git push origin HEAD:main
+      - name: Deploy website and installers to Pages
+        uses: cloudflare/wrangler-action@v4
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: pages deploy public --project-name=tianxia --branch=main
+          gitHubToken: ${{ secrets.GITHUB_TOKEN }}

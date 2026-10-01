@@ -1,0 +1,16 @@
+node_modules/
+.wrangler/
+.DS_Store
+*.log
+.dev.vars
+.env
+.env.*
+!.env.example
+.playwright-cli/
+output/
+local-cache/
+public/desktop/
+src-tauri/target/
+src-tauri/gen/
+src-tauri/*.key
+src-tauri/*.pem

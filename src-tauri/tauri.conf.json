@@ -1,0 +1,55 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "国运",
+  "version": "0.1.15",
+  "identifier": "com.guoyun.game",
+  "build": {
+    "frontendDist": "../public/desktop"
+  },
+  "app": {
+    "withGlobalTauri": true,
+    "windows": [
+      {
+        "label": "main",
+        "title": "国运 · 中国古代 · 角色扮演大战略",
+        "width": 1440,
+        "height": 900,
+        "minWidth": 1080,
+        "minHeight": 720,
+        "resizable": true,
+        "fullscreen": false
+      }
+    ],
+    "security": {
+      "csp": "default-src 'self' https://tianxia-ddr.pages.dev; connect-src 'self' https://tianxia-ddr.pages.dev; img-src 'self' data: blob:; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'"
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": ["dmg", "nsis"],
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.png",
+      "icons/icon.icns",
+      "icons/icon.ico"
+    ],
+    "createUpdaterArtifacts": true,
+    "macOS": {
+      "signingIdentity": "-",
+      "minimumSystemVersion": "11.0"
+    }
+  },
+  "plugins": {
+    "updater": {
+      "pubkey": "TAURI_UPDATER_PUBLIC_KEY_REQUIRED",
+      "endpoints": [
+        "https://tianxia-ddr.pages.dev/api/desktop-updates"
+      ],
+      "windows": {
+        "installMode": "passive"
+      }
+    }
+  }
+}

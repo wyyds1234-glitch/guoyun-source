@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
+  <title>国运 · 朱砂国印</title>
+  <!-- Original vector artwork; no external fonts, textures or paid assets. -->
+  <rect x="80" y="88" width="864" height="856" rx="184" fill="#64382f"/>
+  <rect x="80" y="80" width="864" height="848" rx="184" fill="#a85847"/>
+  <rect x="110" y="110" width="804" height="784" rx="160" fill="none" stroke="#c77c62" stroke-width="8"/>
+  <path d="M258 194H194V258M766 194H830V258M194 766V830H258M830 766V830H766" fill="none" stroke="#ddbf93" stroke-width="16"/>
+  <!-- A deliberately broad, legible 国 glyph, drawn as paths at all sizes. -->
+  <path d="M310 284H714V740H310Z" fill="none" stroke="#f2e5c9" stroke-width="48" stroke-linejoin="miter"/>
+  <path d="M391 386H633M407 511H617M382 637H642M512 386V637" fill="none" stroke="#f2e5c9" stroke-width="40" stroke-linecap="square"/>
+  <path d="M585 556L616 583" fill="none" stroke="#f2e5c9" stroke-width="29" stroke-linecap="square"/>
+</svg>

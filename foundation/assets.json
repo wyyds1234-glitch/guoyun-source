@@ -1,0 +1,91 @@
+{
+  "version": "maps-v3",
+  "storage": "cloudflare-pages-static",
+  "basePath": "public/data",
+  "assets": [
+    {
+      "file": "public/data/brand/guoyun-icon-v2.svg",
+      "bytes": 1021,
+      "sha256": "59f41ee3a9f8ea6e507d300c02b48b2c216c5d0d9d4087aed8b6ee63a04674da",
+      "contentType": "image/svg+xml"
+    },
+    {
+      "file": "public/data/natural-earth-land-110m.geojson",
+      "bytes": 565368,
+      "sha256": "f52e2f6522e8bd0c9cb4b67fb9e804007b0fa6f25ce32df1f2f5659bd2852db7",
+      "contentType": "application/geo+json"
+    },
+    {
+      "file": "public/data/natural-earth-land-50m.geojson",
+      "bytes": 672292,
+      "sha256": "7dbdb7ba21438a85d374df99e2ccb8c24c4aa858577774f292d61d7c57bb5427",
+      "contentType": "application/geo+json"
+    },
+    {
+      "file": "public/data/natural-earth-land-10m.geojson",
+      "bytes": 1630590,
+      "sha256": "e480e4869186b876c41120a709dcaec468b3d456a65fdc1e70e8898f6ae2d483",
+      "contentType": "application/geo+json"
+    },
+    {
+      "file": "public/data/natural-earth-rivers.geojson",
+      "bytes": 1557388,
+      "sha256": "dff6db4e1faefa715bb19837bed402452bad80fb5d41c622c3d8474ab00a38f9",
+      "contentType": "application/geo+json"
+    },
+    {
+      "file": "public/data/natural-earth-lakes.geojson",
+      "bytes": 125419,
+      "sha256": "6c1b288db7696646f85d21564027acdde5126635c55e38c2a14b648bc1b2abf8",
+      "contentType": "application/geo+json"
+    },
+    {
+      "file": "public/data/natural-earth-terrain.geojson",
+      "bytes": 46991,
+      "sha256": "6884f8ecfdb9ecb4ce952773c2a49fc8b78f8e2c2010d2a1f58977dae31b1fdc",
+      "contentType": "application/geo+json"
+    },
+    {
+      "file": "public/data/strategy-regions.geojson",
+      "bytes": 5793400,
+      "sha256": "b32765bb771d0b5d8a1d13145b8e57632581c3bc844811df47c29623a3f7ddea",
+      "contentType": "application/geo+json"
+    },
+    {
+      "file": "public/data/strategy-provinces.geojson",
+      "bytes": 5732496,
+      "sha256": "0012a768519b12be2b285c691231be37f468f0e63295180af1c949dc7b710c36",
+      "contentType": "application/geo+json"
+    },
+    {
+      "file": "public/data/strategy-adjacency.json",
+      "bytes": 86219,
+      "sha256": "fde17b334f54b17bf0bf239260c377d2b4254677aa3b03899c9819c996394a39",
+      "contentType": "application/json"
+    },
+    {
+      "file": "public/data/strategy-adjacency.js",
+      "bytes": 86252,
+      "sha256": "1ac034ab74e0f10f6f583d8364e1f8983bd72b5f71cb0e376060c1cbe413034e",
+      "contentType": "application/javascript"
+    },
+    {
+      "file": "public/data/tang-map-model.json",
+      "bytes": 96610,
+      "sha256": "e80adef3836bb15026312175356072b3fddd64f786bf7b3e89891b7ecfd9642d",
+      "contentType": "application/json"
+    },
+    {
+      "file": "public/data/tang-map-model.js",
+      "bytes": 96635,
+      "sha256": "e6d253d8f8466af0d57f29778f60874d729276667317444da1078c9902300beb",
+      "contentType": "application/javascript"
+    },
+    {
+      "file": "public/data/eurasia-factions-741.js",
+      "bytes": 3335,
+      "sha256": "96bcd70eed05052bbbc608d95971c9d71c19df758b460343221fc3119647559c",
+      "contentType": "application/javascript"
+    }
+  ]
+}

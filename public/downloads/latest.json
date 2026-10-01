@@ -1,0 +1,20 @@
+{
+  "version": "0.1.15",
+  "mac_arm64_url": null,
+  "windows_x64_url": "/downloads/Guoyun-Setup-0.1.15.exe",
+  "mac_size": null,
+  "windows_size": 7659974,
+  "published_at": "2026-09-17T04:28:38.416Z",
+  "platforms": {
+    "mac_arm64": {
+      "available": false,
+      "asset": null,
+      "size": null
+    },
+    "windows_x64": {
+      "available": true,
+      "asset": "/downloads/Guoyun-Setup-0.1.15.exe",
+      "size": 7659974
+    }
+  }
+}

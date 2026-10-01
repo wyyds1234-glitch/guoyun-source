@@ -1,0 +1,565 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <base href="../" />
+    <meta name="theme-color" content="#15120e" />
+    <meta name="category" content="历史" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <link rel="icon" href="/favicon.svg?v=v3-20260813" type="image/svg+xml" />
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <meta
+      name="description"
+      content="国运是一款历史类中国古代角色扮演大战略游戏。以唐代舆图统筹军团、补给与政治抉择。一身入局，万里山河皆可改写。"
+    />
+    <title>国运 · 中国古代 · 角色扮演大战略</title>
+    <script type="application/ld+json">{"@context":"https://schema.org","@type":"VideoGame","name":"国运","genre":"历史","inLanguage":"zh-CN","url":"https://tianxia-ddr.pages.dev/play/"}</script>
+    <link rel="stylesheet" href="/styles.css?v=marker-lod-20260930" />
+  </head>
+  <body>
+    <header class="topbar grand-topbar">
+      <a class="brand" href="/" aria-label="国运官网首页">
+        <strong>国运</strong>
+        <span class="game-genre" aria-label="游戏类别：历史">历史 · 大战略</span>
+      </a>
+      <div class="era-block strategic-clock">
+        <span id="yearLabel">唐开元二十九年 · 741年1月1日</span>
+        <span class="action-label" id="actionPointsLabel">令 3/3</span><span class="turn-pips" id="actionPips" aria-label="政令点数"></span>
+        <div class="speed-controls" aria-label="时间速度">
+          <button id="pauseButton" type="button" data-speed="0" aria-label="暂停">Ⅱ</button>
+          <button type="button" data-speed="1">1×</button>
+          <button type="button" data-speed="2">2×</button>
+          <button type="button" data-speed="3">3×</button>
+          <button type="button" data-speed="4">4×</button>
+        </div>
+        <span id="clockStatus" class="clock-status" role="status" aria-live="polite">已暂停</span>
+      </div>
+      <div class="top-actions">
+        <button class="icon-button" id="soundButton" type="button" title="开关音效" aria-label="开关音效">◖</button>
+        <button class="icon-button panel-visibility-toggle" id="toggleAllPanels" type="button" title="隐藏全部面板" aria-label="隐藏全部面板" aria-pressed="false">◫</button>
+        <button class="text-button cloud-button" id="cloudButton" type="button"><i id="cloudStatusDot"></i><span id="cloudButtonText">连接中 · 云端</span></button>
+        <a class="text-button install-button" href="/download/">下载桌面版</a>
+        <button class="text-button" id="helpButton" type="button">玩法</button>
+        <button class="text-button danger-text" id="resetButton" type="button">重开</button>
+      </div>
+    </header>
+
+    <section class="resource-bar" aria-label="国家资源">
+      <div class="resource gold">
+        <span class="resource-icon">贯</span>
+        <span><small>国库</small><strong id="goldValue">850</strong></span>
+        <em id="goldIncome">+0/月</em>
+      </div>
+      <div class="resource grain">
+        <span class="resource-icon">禾</span>
+        <span><small>粮草</small><strong id="grainValue">900</strong></span>
+        <em id="grainIncome">净 +0/月</em>
+      </div>
+      <div class="resource people">
+        <span class="resource-icon">民</span>
+        <span><small title="游戏人口规模点数，并非历史人口统计">人口规模</small><strong id="populationValue">4,200</strong></span>
+        <em id="populationIncome">+0点/月</em>
+      </div>
+      <div class="resource morale">
+        <span class="resource-icon">心</span>
+        <span><small>民心</small><strong id="moraleValue">68%</strong></span>
+        <em id="moraleTrend">安定</em>
+      </div>
+      <div class="resource prestige">
+        <span class="resource-icon">威</span>
+        <span><small>威望</small><strong id="prestigeValue">12</strong></span>
+        <em id="rankLabel">天子临御</em>
+      </div>
+      <div class="resource army-total">
+        <span class="resource-icon">军</span>
+        <span><small>总兵力</small><strong id="totalArmyValue">800</strong></span>
+        <em id="armyStatus">2 个军团</em>
+      </div>
+    </section>
+
+    <main class="game-shell">
+      <aside class="left-rail">
+        <button class="panel-rail-toggle panel-rail-toggle-left" id="toggleLeftPanel" type="button" aria-label="收起左侧面板" aria-pressed="false"><span aria-hidden="true">‹</span><b>收起</b></button>
+        <section class="ruler-card panel-ink">
+          <div class="ruler-portrait" aria-hidden="true">
+            <span id="rulerInitial">玄</span>
+            <i></i>
+          </div>
+          <div>
+            <small id="rulerRole">身份待定</small>
+            <h2 id="rulerName">玄宗</h2>
+            <p id="kingdomName">历史剧本 · 唐 · 京畿道</p>
+          </div>
+          <div class="mandate-meter">
+            <span><b>天命</b><em id="mandateText">方兴未艾</em></span>
+            <div><i id="mandateFill"></i></div>
+          </div>
+        </section>
+
+        <nav class="main-nav strategic-nav" aria-label="国事分类">
+          <button class="nav-item active" type="button" data-view="map">
+            <span>图</span><b>战略舆图</b><small>审视山河</small>
+          </button>
+          <button class="nav-item" type="button" data-view="court">
+            <span>冊</span><b>内政朝堂</b><small>富国安民</small>
+          </button>
+          <button class="nav-item" type="button" data-view="army">
+            <span>戈</span><b>军府校场</b><small>强兵征伐</small>
+          </button>
+          <button class="nav-item" type="button" data-view="diplomacy">
+            <span>盟</span><b>纵横外交</b><small>合纵连横</small>
+          </button>
+          <button class="nav-item" type="button" data-view="institutions">
+            <span>制</span><b>朝廷制度</b><small>择定国策</small>
+          </button>
+          <button class="nav-item" type="button" data-view="decisions">
+            <span>诏</span><b>国家决策</b><small>颁布诏令</small>
+          </button>
+        </nav>
+
+        <section class="campaign-goal panel-ink">
+          <div class="section-kicker">王业进度</div>
+          <div class="goal-row">
+            <strong><span id="ownedCount">1</span>/15 道</strong>
+            <span id="unityPercent">7%</span>
+          </div>
+          <div class="goal-track"><i id="unityFill"></i></div>
+          <p id="goalHint">据守长安，整饬军府，再与诸道争衡。</p>
+        </section>
+      </aside>
+
+      <section class="stage">
+        <div class="view active" id="mapView">
+          <div class="stage-heading">
+            <div>
+              <span class="section-kicker">开元二十九年</span>
+              <h1 id="mapTitle">天下舆图</h1>
+              <p class="map-year-label" id="mapYearLabel">唐 · 十五道 · 公元741年</p>
+            </div>
+            <div class="legend" aria-label="地图图例">
+              <span><i class="legend-dynasty"></i>势力疆域</span>
+              <span><i class="legend-border"></i>政治边境</span>
+              <span><i class="legend-dao"></i>行政道界</span>
+              <span><i class="legend-selected"></i>当前选中</span>
+              <span><i class="legend-front"></i>战争前线</span>
+            </div>
+          </div>
+
+          <div class="map-and-detail">
+            <div class="map-frame">
+              <div class="map-corner top-left"></div>
+              <div class="map-corner top-right"></div>
+              <div class="map-corner bottom-left"></div>
+              <div class="map-corner bottom-right"></div>
+              <canvas id="mapPhysicalCanvas" class="map-physical-canvas" width="2400" height="1520" aria-hidden="true"></canvas>
+              <canvas id="mapMidCanvas" class="map-physical-canvas map-mid-canvas" width="2400" height="1520" aria-hidden="true" hidden></canvas>
+              <canvas id="mapDetailCanvas" class="map-physical-canvas map-detail-canvas" width="2400" height="1520" aria-hidden="true" hidden></canvas>
+                <svg id="worldMap" viewBox="0 0 1200 760" preserveAspectRatio="none" role="img" aria-label="国运唐代开元二十九年天下舆图：十五道、州府、军镇与关隘">
+                <defs>
+                  <clipPath id="landClip"><path></path></clipPath>
+                  <!-- Directional route heads.  strokeWidth units keep the
+                       arrowheads screen-sized while the geographic route
+                       itself follows the persistent map viewport. -->
+                  <marker id="movement-arrow-attack" viewBox="0 0 5 5" refX="4.2" refY="2.5" markerWidth="5" markerHeight="5" markerUnits="strokeWidth" orient="auto">
+                    <path d="M0,0 L5,2.5 L0,5 Z"></path>
+                  </marker>
+                  <marker id="movement-arrow-move" viewBox="0 0 5 5" refX="4.2" refY="2.5" markerWidth="5" markerHeight="5" markerUnits="strokeWidth" orient="auto">
+                    <path d="M0,0 L5,2.5 L0,5 Z"></path>
+                  </marker>
+                  <marker id="movement-arrow-retreat" viewBox="0 0 5 5" refX="4.2" refY="2.5" markerWidth="5" markerHeight="5" markerUnits="strokeWidth" orient="auto">
+                    <path d="M0,0 L5,2.5 L0,5 Z"></path>
+                  </marker>
+                  <pattern id="occupationHatch" width="8" height="8" patternUnits="userSpaceOnUse">
+                    <path d="M-2,2 L2,-2 M0,8 L8,0 M6,10 L10,6" stroke="#493f35" stroke-opacity=".42" stroke-width="1.1" fill="none"></path>
+                  </pattern>
+                </defs>
+                <!-- Ocean is the map-frame background. The SVG contains only
+                     geographic and interactive layers; no full-screen rect or
+                     texture can ever sit above physical land. -->
+                <g id="mapWorld" class="geo-viewport map-world">
+                  <g id="graticuleLayer" class="graticule-layer" aria-hidden="true"></g>
+                  <g id="landLayer" class="land-layer" aria-label="真实欧亚海岸线"></g>
+                  <g id="terrainLayer" class="terrain-geo-layer" aria-label="真实地形"></g>
+                  <g id="mountainAxisLayer" class="mountain-axis-layer" aria-label="山地轴线"></g>
+                  <g id="outerPolityLayer" class="outer-polity-layer" aria-label="唐代外围政权与前沿地带"></g>
+                  <g clip-path="url(#landClip)">
+                    <g id="territoryLayer" class="territory-layer" aria-label="唐代道府州与战略区域"></g>
+                    <g id="regionBorderLayer" class="region-border-layer" aria-label="战略区域共享边界"></g>
+                    <g id="provinceBoundaryLayer" class="province-boundary-layer" aria-label="唐代道府州 GeoJSON 边界"></g>
+                  </g>
+                  <g id="lakeLayer" class="lake-layer" aria-label="湖泊"></g>
+                  <g id="riverLayer" class="river-geo-layer" aria-label="河流"></g>
+                  <g id="routeLayer" class="route-layer" aria-hidden="true"></g>
+                  <g id="movementPathLayer" class="movement-layer" aria-hidden="true"></g>
+                </g>
+                <g id="mapUi" class="map-ui" aria-label="固定屏幕尺寸的地图标记与标签">
+                  <g id="terrainLabelLayer" class="terrain-geo-labels" aria-hidden="true"></g>
+                  <g id="mountainLabelLayer" class="mountain-axis-labels" aria-hidden="true"></g>
+                  <g id="outerPolityLabelLayer" class="outer-polity-label-layer" aria-hidden="true"></g>
+                  <g id="riverLabelLayer" class="river-geo-labels" aria-hidden="true"></g>
+                  <g id="worldLabelLayer" class="world-label-layer" aria-hidden="true"></g>
+                  <g id="provinceLabelLayer" class="province-label-layer" aria-label="唐代道府州标签"></g>
+                  <g id="regionLayer" class="region-layer" aria-label="郡县、城池、关隘与港口"></g>
+                  <g id="frontLineLayer" class="front-line-layer" aria-hidden="true"></g>
+                  <g id="movementMarkerLayer" class="movement-marker-layer" aria-hidden="true"></g>
+                  <g id="armyLayer" class="army-layer" aria-label="地图军团"></g>
+                </g>
+              </svg>
+              <div class="map-controls" aria-label="地图缩放控制">
+                <button id="mapZoomIn" type="button" aria-label="放大地图">+</button>
+                <button id="mapZoomOut" type="button" aria-label="缩小地图">−</button>
+                <button id="mapResetView" type="button" aria-label="返回大唐核心视角">全</button>
+                <output id="mapZoomReadout">3.5× · 大唐</output>
+              </div>
+              <div class="map-tooltip hidden" id="mapTooltip" role="status"></div>
+              <div class="map-key"><span><b class="key-city"></b>城池</span><span><b class="key-gate"></b>关隘</span><span><b class="key-port"></b>港口</span><span><b class="key-farm"></b>农区</span><small>100 个经纬度战略区域 · 几何邻接行军</small></div>
+              <small class="map-attribution">外围势力仅标注方位；未核定疆界不作领土绘制。</small>
+              <div class="map-stamp">开元<br />舆图</div>
+            </div>
+
+            <article class="province-card panel-ink" id="provinceCard" data-right-pane="region">
+              <div class="province-banner">
+                <span id="provinceSigil">司</span>
+                <div><small id="selectionKind">当前选中 · 京兆府治</small><h2 id="provinceName">长安</h2><b id="selectionBreadcrumb">关内道 &gt; 京兆府 &gt; 长安</b></div>
+                <i id="provinceStatus">我方疆土</i>
+              </div>
+              <p id="provinceLore">河山形胜，四方辐辏，得之可号令四海。</p>
+              <div class="province-stats four">
+                <div><span>富庶</span><strong id="provinceProsperity">52</strong></div>
+                <div><span>城防</span><strong id="provinceDefense">55</strong></div>
+                <div><span>守军</span><strong id="provinceTroops">王师驻守</strong></div>
+                <div><span>地形</span><strong id="provinceTerrain">平原</strong></div>
+              </div>
+              <div class="province-assets" id="provinceAssets">
+                <span><b class="asset-city">城</b><i>节点</i><strong id="provinceCity">府治 · 防御 76</strong></span>
+                <span><b class="asset-farm">田</b><i>资源</i><strong id="provinceFarm">粮产 88 · 人口规模 82点</strong></span>
+                <span><b class="asset-camp">营</b><i>驻防</i><strong id="provinceCamp">驻军 123 · 堡垒 2级</strong></span>
+              </div>
+              <div class="region-meta-grid">
+                <span><i>经济</i><strong id="provinceEconomy">繁荣 52</strong></span>
+                <span><i>控制者</i><strong id="provinceController">大唐 · 玄宗</strong></span>
+                <span><i>当前军团</i><strong id="provinceArmies">虎贲第一军</strong></span>
+                <span><i>战争</i><strong id="provinceWar">无战事</strong></span>
+              </div>
+              <div class="campaign-strip hidden" id="campaignStrip"><span id="campaignStage">围城</span><div><i id="campaignFill"></i></div><strong id="campaignProgress">0%</strong></div>
+              <div class="controller-row">
+                <span>所属势力</span><strong id="provinceOwner">大唐 · 玄宗</strong>
+              </div>
+              <button class="primary-action hidden" id="attackButton" type="button">点将出征</button>
+              <div class="adjacency-note"><span>相邻地区</span><div id="adjacencyList"></div></div>
+            </article>
+            <div class="order-hint hidden" id="orderHint" aria-label="当前军令选择"><b id="orderHintArmy"></b><button id="stopArmyOrders" type="button">停止行军</button><button id="cancelArmySelection" type="button">取消选择</button></div>
+          </div>
+        </div>
+
+        <div class="view" id="courtView">
+          <div class="stage-heading">
+            <div><span class="section-kicker">治国理政</span><h1>内政朝堂</h1></div>
+            <button class="drawer-close" type="button" data-close-drawer aria-label="关闭内政面板">×</button>
+            <p class="heading-note">每道政令消耗一点行动力</p>
+          </div>
+          <div class="action-grid" id="courtActions"></div>
+          <section class="policy-summary panel-ink">
+            <div><span class="section-kicker">本朝国策</span><h2>社稷根基</h2></div>
+            <div class="policy-stat"><span>农田等级</span><strong id="farmLevel">1</strong></div>
+            <div class="policy-stat"><span>商路等级</span><strong id="marketLevel">1</strong></div>
+            <div class="policy-stat"><span>城防等级</span><strong id="wallLevel">1</strong></div>
+            <div class="policy-stat"><span>军团消耗/月</span><strong id="upkeepValue">-54</strong></div>
+          </section>
+        </div>
+
+        <div class="view" id="armyView">
+          <div class="stage-heading">
+            <div><span class="section-kicker">整军经武</span><h1>军府校场</h1></div>
+            <div class="army-power"><small>王师战力</small><strong id="armyPowerValue">1,018</strong></div>
+            <button class="drawer-close" type="button" data-close-drawer aria-label="关闭军事面板">×</button>
+          </div>
+          <div class="army-overview">
+            <article class="unit-card infantry">
+              <span class="unit-icon">盾</span><small>中军</small><h2>步卒</h2><strong id="infantryValue">600</strong>
+              <p>坚阵持久，攻守均衡</p><button type="button" data-recruit="infantry">征募 200</button>
+              <em>120 贯 · 90 粮 · 1 行动力</em>
+            </article>
+            <article class="unit-card archers">
+              <span class="unit-icon">弓</span><small>远军</small><h2>弓手</h2><strong id="archersValue">150</strong>
+              <p>据城强势，压制步阵</p><button type="button" data-recruit="archers">征募 100</button>
+              <em>130 贯 · 80 粮 · 1 行动力</em>
+            </article>
+            <article class="unit-card cavalry">
+              <span class="unit-icon">骑</span><small>锐军</small><h2>骑兵</h2><strong id="cavalryValue">50</strong>
+              <p>冲锋破阵，野战称雄</p><button type="button" data-recruit="cavalry">征募 50</button>
+              <em>180 贯 · 100 粮 · 1 行动力</em>
+            </article>
+          </div>
+          <div class="military-orders">
+            <button class="order-card" type="button" data-order="drill">
+              <span>校场操练</span><small>100 粮 · 1 行动力</small><strong>全军战力 +8%</strong>
+            </button>
+            <button class="order-card" type="button" data-order="fortify">
+              <span>整修城防</span><small>180 贯 · 1 行动力</small><strong>城防等级 +1</strong>
+            </button>
+          </div>
+          <section class="army-formation panel-ink">
+            <div><span class="section-kicker">编制军府</span><h2>扩充军团</h2></div>
+            <p id="recruitTargetLabel">当前征募对象：羽林第一军</p>
+            <button class="formation-button" id="createArmyButton" type="button">组建新军团</button>
+            <small>260 贯 · 180 粮 · 200 人口点 · 1 行动力<br>初编 160 步卒 · 30 弓手 · 10 骑兵（共 200 人）</small>
+          </section>
+          <section class="frontier panel-ink">
+            <div><span class="section-kicker">可征之地</span><h2>边境军情</h2></div>
+            <div class="frontier-list" id="frontierList"></div>
+          </section>
+        </div>
+
+        <div class="view strategy-drawer" id="diplomacyView">
+          <div class="stage-heading"><div><span class="section-kicker">诸道合纵</span><h1>纵横外交</h1></div><button class="drawer-close" type="button" data-close-drawer>×</button></div>
+          <div class="diplomacy-list" id="diplomacyList"></div>
+        </div>
+
+        <div class="view strategy-drawer" id="institutionsView">
+          <div class="stage-heading"><div><span class="section-kicker">治道所归</span><h1>朝廷制度</h1></div><button class="drawer-close" type="button" data-close-drawer>×</button></div>
+          <div class="policy-tree" id="policyTree">
+            <button class="policy-node unlocked" data-policy="restore"><b>重整朝纲</b><small>已完成</small></button>
+            <div class="policy-branches"><button class="policy-node" data-policy="benevolence"><b>轻徭薄赋</b><small>民心与粮产</small></button><button class="policy-node" data-policy="hegemony"><b>军功授爵</b><small>征兵与战力</small></button></div>
+          </div>
+        </div>
+
+        <div class="view strategy-drawer" id="decisionsView">
+          <div class="stage-heading"><div><span class="section-kicker">诏令待决</span><h1>国家决策</h1></div><button class="drawer-close" type="button" data-close-drawer>×</button></div>
+          <div class="decision-list" id="decisionList"></div>
+        </div>
+      </section>
+
+      <aside class="right-rail" aria-label="右侧信息面板" data-active-tab="region">
+        <button class="panel-rail-toggle panel-rail-toggle-right" id="toggleRightPanel" type="button" aria-label="收起右侧面板" aria-pressed="false"><span aria-hidden="true">›</span><b>收起</b></button>
+        <nav class="right-sidebar-tabs" aria-label="右侧信息面板分类">
+          <button type="button" data-right-tab="region" aria-controls="provinceCard">地区</button>
+          <button type="button" data-right-tab="army" aria-controls="armyCommandPanel">军团</button>
+          <button type="button" data-right-tab="operation" aria-controls="battlePlanPanel">作战</button>
+          <button type="button" data-right-tab="war" aria-controls="warOverviewPanel">军情</button>
+        </nav>
+        <section class="battle-plan panel-ink" id="battlePlanPanel" data-right-pane="operation" aria-live="polite">
+          <div class="battle-plan-heading">
+            <div><span class="section-kicker">军令中枢</span><h2 id="battlePlanTitle">作战计划</h2></div>
+            <span id="battlePlanState">待命</span>
+          </div>
+          <div id="battlePlanBody">
+            <div class="battle-plan-selection" id="battlePlanSelection">未选择军团</div>
+            <div class="battle-plan-actions"><button id="selectAllArmies" type="button">批量选择直属军团</button><button id="clearArmyGroup" type="button">清空选择</button></div>
+            <div class="battle-plan-target hidden" id="battlePlanTarget">
+              <small>当前目标</small>
+              <strong id="contextTargetName">选择地图上的目标地区</strong>
+              <span id="contextTargetStats">选择军团后点击地区，生成路线与战况预估。</span>
+              <div class="battle-plan-coordination hidden" id="battlePlanCoordination">
+                <span>协同方式</span>
+                <button id="coordWaitAll" type="button" data-coordination-mode="WAIT_FOR_ALL">等待会师后总攻</button>
+                <button id="coordAttackArrival" type="button" data-coordination-mode="ATTACK_ON_ARRIVAL">各军抵达即进攻</button>
+              </div>
+              <div class="battle-plan-actions">
+                <button id="confirmRegionOrder" type="button">确认军令</button>
+                <button id="retreatRegionOrder" type="button">撤退</button>
+                <button id="viewRegionTarget" type="button">查看</button>
+                <button id="cancelRegionOrder" type="button">取消预览</button>
+              </div>
+            </div>
+            <div class="battle-plan-list" id="battlePlanList"></div>
+          </div>
+        </section>
+        <section class="army-command panel-ink" id="armyCommandPanel" data-right-pane="army">
+          <div class="chronicle-title"><div><span class="section-kicker">中军都督府</span><h2>王师军团</h2></div><span id="armyCountLabel">2军</span></div>
+          <div class="army-list" id="armyList"></div>
+        </section>
+
+        <section class="war-overview panel-ink" id="warOverviewPanel" data-right-pane="war">
+          <div class="chronicle-title"><div><span class="section-kicker">边境急报</span><h2>战争与警报</h2></div><span class="alert-dot" id="alertDot"></span></div>
+          <div id="warList" class="war-list"></div>
+        </section>
+        <section class="season-card" data-right-pane="war">
+          <div class="season-sun" id="seasonIcon">冬</div>
+          <div><small>当前节气</small><strong id="seasonName">玄冬闭藏</strong><p id="seasonEffect">商路税收 -10%</p></div>
+        </section>
+
+        <section class="advisor-card panel-ink" data-right-pane="war">
+          <div class="advisor-header">
+            <div class="advisor-avatar">策</div>
+            <div><small>首辅 · 沈砚</small><strong>军国奏对</strong></div>
+          </div>
+          <blockquote id="advisorText">“当广积钱粮、安抚黎庶，待甲兵充足再问鼎四方。”</blockquote>
+        </section>
+
+        <section class="chronicle panel-ink" data-right-pane="war">
+          <div class="chronicle-title">
+            <div><span class="section-kicker">起居注</span><h2>朝廷纪事</h2></div>
+            <button type="button" id="clearLogButton" aria-label="清空次要记录">清卷</button>
+          </div>
+          <div class="log-list" id="logList" aria-live="polite"></div>
+        </section>
+
+        <button class="end-turn" id="endTurnButton" type="button">
+          <span><small>时序推演 ·</small><strong>推进一个月</strong></span><i aria-hidden="true">›</i>
+        </button>
+        <p class="autosave-note" id="autosaveNote"><span></span><b>连接中 · 本地缓存可用</b></p>
+      </aside>
+    </main>
+
+    <nav class="map-mode-bar" aria-label="地图模式">
+      <span>地图模式</span>
+      <button class="active" type="button" data-map-mode="faction">政治</button>
+      <button type="button" data-map-mode="terrain">地形</button>
+      <button type="button" data-map-mode="supply">补给</button>
+      <button type="button" data-map-mode="population">人口</button>
+      <button type="button" data-map-mode="military">军事</button>
+      <button type="button" data-map-mode="economy">经济</button>
+      <button type="button" data-map-mode="morale">民心</button>
+      <button type="button" data-map-mode="grain">粮食</button>
+      <button type="button" data-map-mode="diplomacy">外交</button>
+      <em id="mapModeDescription">显示各方控制疆域</em>
+    </nav>
+
+    <div class="toast-stack" id="toastStack" aria-live="polite"></div>
+
+    <aside class="pwa-update-banner" id="pwaUpdate" hidden aria-live="polite">
+      <div><b>新版本可用</b><span>先同步当前王业，再更新舆图与游戏文件。</span></div>
+      <div class="pwa-update-actions">
+        <button type="button" id="pwaUpdateLater">稍后</button>
+        <button type="button" class="primary-action" id="pwaUpdateNow">更新并重启</button>
+      </div>
+    </aside>
+
+    <dialog class="setup-modal" id="setupModal">
+      <form method="dialog" id="setupForm">
+        <div class="modal-ornament">◆</div>
+        <span class="section-kicker">开元二十九年</span>
+        <h1>选择你的身份</h1>
+        <p>中国古代 · 角色扮演大战略<br />一身入局，万里山河皆可改写。</p>
+        <p>本局采用公元741年的唐代地名与地理；此时唐玄宗已在位近三十年。为形成战略玩法，道级势力与兵力经过游戏化编排，并非对当年真实疆域和战局的复原。反叛、自立与自建人物路线属于架空推演。</p>
+        <label>人物入口<select id="characterMode" name="characterMode"><option value="historical">历史人物</option><option value="custom">自建人物</option></select></label>
+        <label id="historicalCharacterField">历史人物<select id="historicalCharacter" name="historicalCharacter"><option value="玄宗">唐玄宗 · 天子</option><option value="郭子仪">郭子仪 · 将领</option><option value="李光弼">李光弼 · 将领</option></select></label>
+        <label id="customCharacterField" class="hidden">自建人物<input id="customCharacter" name="customCharacter" maxlength="8" value="新主" autocomplete="off" /></label>
+        <p class="identity-lock-note" id="historicalIdentitySummary">历史人物身份固定；玄宗开局延续唐室与开元二十九年史境。</p>
+        <fieldset id="politicalPathFieldset" class="hidden">
+          <legend>政治身份</legend>
+          <label class="choice"><input type="radio" name="politicalPath" value="loyal" checked /><span><b>忠臣</b><small>奉诏勤王，守护唐室</small></span></label>
+          <label class="choice"><input type="radio" name="politicalPath" value="rebel" /><span><b>反叛</b><small>起兵抗诏，改写国运</small></span></label>
+          <label class="choice"><input type="radio" name="politicalPath" value="independent" /><span><b>自立</b><small>据地称雄，另立旗号</small></span></label>
+          <label class="choice"><input type="radio" name="politicalPath" value="observer" /><span><b>观望</b><small>韬光养晦，待势而动</small></span></label>
+        </fieldset>
+        <label id="kingdomField" class="hidden">自立国号<input id="kingdomInput" name="kingdom" maxlength="6" value="大晟" autocomplete="off" /></label>
+        <label id="rulerField" class="hidden">自建君主名<input id="rulerInput" name="ruler" maxlength="8" value="新主" autocomplete="off" /></label>
+        <fieldset>
+          <legend>治国之志</legend>
+          <label class="choice"><input type="radio" name="doctrine" value="benevolent" checked /><span><b>仁德</b><small>民心 +10，威望 +5</small></span></label>
+          <label class="choice"><input type="radio" name="doctrine" value="wealth" /><span><b>富国</b><small>国库 +250 贯，粮草 +200</small></span></label>
+          <label class="choice"><input type="radio" name="doctrine" value="military" /><span><b>尚武</b><small>步卒 +200，骑兵 +50</small></span></label>
+        </fieldset>
+        <button class="primary-action begin-button" type="submit">受命于天 · 开始游戏</button>
+        <small class="save-disclaimer">进度将自动保存至云端，并在此浏览器保留最近缓存</small>
+      </form>
+    </dialog>
+
+    <dialog class="cloud-modal" id="cloudModal">
+      <form method="dialog">
+        <button class="modal-close" value="cancel" aria-label="关闭">×</button>
+        <span class="section-kicker">云阙存策</span>
+        <h1>云端存档</h1>
+        <div class="cloud-state" id="cloudState"><i></i><span><b>云端连接中</b><small>连接成功后自动同步；离线时仅使用本地缓存</small></span></div>
+        <label class="cloud-code-label" for="cloudCode">本机存档码</label>
+        <div class="cloud-code-row">
+          <input id="cloudCode" type="text" readonly spellcheck="false" aria-label="本机云端存档码" />
+          <button id="copyCloudCode" type="button">复制</button>
+        </div>
+        <p class="cloud-warning">存档码等同于这份王业的钥匙。请自行妥善保存，不要公开分享；换电脑后输入同一存档码即可恢复。</p>
+        <label class="cloud-code-label" for="importCloudCode">从另一台设备恢复</label>
+        <div class="cloud-code-row">
+          <input id="importCloudCode" type="text" placeholder="TX-XXXXXXXX-XXXXXXXX-XXXXXXXX-XXXXXXXX" autocomplete="off" spellcheck="false" />
+          <button id="importCloudButton" type="button">连接</button>
+        </div>
+        <div class="cloud-actions">
+          <button id="syncCloudButton" class="primary-action" type="button">立即同步</button>
+          <button id="deleteCloudButton" class="danger-action" type="button">删除云端存档</button>
+        </div>
+      </form>
+    </dialog>
+
+    <dialog class="battle-modal" id="battleModal">
+      <form method="dialog" id="battleForm">
+        <button class="modal-close" value="cancel" aria-label="关闭">×</button>
+        <span class="section-kicker">军议 · 古法用兵</span>
+        <h1>出征 <span id="battleTargetName">目标地区</span></h1>
+        <div class="campaign-phase" id="campaignPhase">阶段一 · 行军接敌</div>
+        <div class="versus">
+          <div><small>我军总战力</small><strong id="ourBattlePower">待选军团</strong></div>
+          <span>VS</span>
+          <div><small>敌军守备</small><strong id="enemyBattlePower">待选目标</strong></div>
+        </div>
+        <label class="range-label" for="dispatchRange"><span>调遣兵力</span><strong id="dispatchLabel">70%</strong></label>
+        <input type="range" id="dispatchRange" min="40" max="100" step="10" value="70" />
+        <div class="dispatch-breakdown" id="dispatchBreakdown"></div>
+        <fieldset class="tactic-picker" id="tacticPicker">
+          <legend>本轮方略</legend>
+          <label><input type="radio" name="tactic" value="field" checked><span><b>列阵野战</b><small>击溃城外守军，伤亡适中</small></span></label>
+          <label><input type="radio" name="tactic" value="siege"><span><b>断粮围城</b><small>耗时较久，伤亡较低，防敌增援</small></span></label>
+          <label><input type="radio" name="tactic" value="assault"><span><b>备器强攻</b><small>破城最快，但攻坚伤亡极高</small></span></label>
+        </fieldset>
+        <div class="odds-row"><span>军师推演</span><strong id="battleOdds">胜负难料</strong></div>
+        <p class="battle-warning" id="battleWarning">每轮军事行动消耗 1 行动力和军粮。破敌野战、摧毁城防并使攻城进度达到 100% 后，才可占领府治。</p>
+        <button class="primary-action" id="confirmBattleButton" value="default" type="submit">下令进军</button>
+      </form>
+    </dialog>
+
+    <dialog class="event-modal" id="eventModal">
+      <form method="dialog" id="eventForm">
+        <div class="event-emblem" id="eventEmblem">报</div>
+        <span class="section-kicker">八百里加急</span>
+        <h1 id="eventTitle">国事突发</h1>
+        <p id="eventDescription"></p>
+        <div class="event-choices" id="eventChoices"></div>
+      </form>
+    </dialog>
+
+    <dialog class="result-modal" id="resultModal">
+      <div class="result-rays" aria-hidden="true"></div>
+      <div class="result-content">
+        <span class="result-seal" id="resultSeal">统</span>
+        <span class="section-kicker" id="resultKicker">四海归心</span>
+        <h1 id="resultTitle">诸道一统</h1>
+        <p id="resultText"></p>
+        <div class="result-stats" id="resultStats"></div>
+        <button class="primary-action" id="resultRestartButton" type="button">再开一朝</button>
+      </div>
+    </dialog>
+
+    <dialog class="help-modal" id="helpModal">
+      <form method="dialog">
+        <button class="modal-close" value="cancel" aria-label="关闭">×</button>
+        <span class="section-kicker">帝王之术</span>
+        <h1>如何一统四海</h1>
+        <ol>
+          <li><b>掌控时间</b><span>空格暂停或继续；数字 1–4 切换速度。暂停后可规划军令，继续时按原速度推进；税赋、补给与敌我行动随游戏日期结算。</span></li>
+          <li><b>经营疆土</b><span>开元十五道是行政层，实际地图包含 100 个战略区域、州治、关隘、港口和农业区；节点全部使用经纬度。人口规模以游戏点数抽象，不代表历史人口统计。</span></li>
+          <li><b>选择地区</b><span>普通点击地区：查看/选中地区。</span></li>
+          <li><b>地图用兵</b><span>选择军团后点击目标地区：行军或出征。军团会沿驿道、山道、关道、渡口或水路逐区推进。</span></li>
+          <li><b>地图操作</b><span>双击放大，拖拽平移；Shift+点击军团多选，Tab收起面板。输入文字或打开弹窗时，快捷键不影响游戏。</span></li>
+          <li><b>攻守有据</b><span>平原利骑兵，山道减速耗粮，渡河进攻受罚，函谷关、剑阁等关隘能以少御多；控制府治与多数战略区域后才算夺取本道。</span></li>
+        </ol>
+        <p class="help-tip">提示：滚轮或触控板缩放、拖拽平移、双击放大；底部可切换政治、地形、补给、人口、军事、经济、民心、粮食与外交地图。</p>
+        <button class="primary-action" id="helpAcknowledge" value="default">已知晓</button>
+      </form>
+    </dialog>
+
+    <script src="/vendor/d3.v7.min.js?v=v3-20260813"></script>
+    <script src="/version.js?v=app-0.4.19"></script>
+    <script src="/era-config.js?v=tang-atlas-20260825-1"></script>
+    <script src="/data/tang-map-model.js?v=tang-map-model-v2"></script>
+    <script src="/data/eurasia-factions-741.js?v=verified-ranges-20260913"></script>
+    <script src="/data/strategy-adjacency.js?v=p0-adjacency1-20260821"></script>
+    <script src="/regions.js?v=p0-adjacency2-20260824"></script>
+    <script src="/cloud-save.js?v=cloud-queue-20260919"></script>
+    <script src="/geo-map.js?v=marker-collision-20260930"></script>
+    <script src="/game.js?v=marker-lod-20260930"></script>
+    <script src="/pwa.js?v=app-0.4.19"></script>
+    <script src="/perf-harness.js?v=perf-harness-20260824-3"></script>
+  </body>
+</html>
