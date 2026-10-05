@@ -1,6 +1,6 @@
 import { hashAccessCode, readBearerAccessCode } from "../_shared/auth.js";
 import { apiError, json } from "../_shared/http.js";
-import { MAP_VERSION, parseSaveBody, SAVE_SLOT } from "../_shared/save.js";
+import { MAP_VERSION, MAX_SAVE_BYTES, parseSaveBody, SAVE_SLOT } from "../_shared/save.js";
 
 const RATE_WINDOW_MS = 60_000;
 const RATE_LIMIT = 120;
@@ -35,6 +35,33 @@ function jsonFor(request, data, init = {}) {
 
 function errorFor(request, status, code, message, init = {}) {
   return responseFor(request, apiError(status, code, message, { ...init, headers: { ...corsHeaders(request), ...(init.headers || {}) } }));
+}
+
+async function readBoundedBody(request, maxBytes) {
+  if (!request.body) return { text: "" };
+  const reader = request.body.getReader();
+  const bytes = new Uint8Array(maxBytes);
+  let totalBytes = 0;
+  try {
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      if (value.byteLength > maxBytes - totalBytes) {
+        // Reject immediately even if transport cancellation fails or stalls.
+        void reader.cancel("request body too large").catch(() => {});
+        return { tooLarge: true };
+      }
+      bytes.set(value, totalBytes);
+      totalBytes += value.byteLength;
+    }
+  } finally {
+    reader.releaseLock();
+  }
+  try {
+    return { text: new TextDecoder("utf-8", { fatal: true }).decode(bytes.subarray(0, totalBytes)) };
+  } catch {
+    return { invalidEncoding: true };
+  }
 }
 
 function allowRequest(playerId) {
@@ -95,8 +122,16 @@ export async function onRequestPut({ request, env }) {
   const playerId = identity.playerId;
 
   const declaredLength = Number(request.headers.get("content-length") || 0);
-  if (declaredLength > 512 * 1024) return errorFor(request, 413, "save_too_large", "存档超过 512KB 限制。");
-  const parsed = parseSaveBody(await request.text());
+  if (declaredLength > MAX_SAVE_BYTES) return errorFor(request, 413, "save_too_large", "存档超过 512KB 限制。");
+  let body;
+  try {
+    body = await readBoundedBody(request, MAX_SAVE_BYTES);
+  } catch {
+    return errorFor(request, 400, "invalid_save", "无法读取存档请求体。");
+  }
+  if (body.tooLarge) return errorFor(request, 413, "save_too_large", "存档超过 512KB 限制。");
+  if (body.invalidEncoding) return errorFor(request, 400, "invalid_save", "存档必须使用有效的 UTF-8 编码。");
+  const parsed = parseSaveBody(body.text);
   if (parsed.error) return errorFor(request, 400, "invalid_save", parsed.error);
 
   const { state, summary, clientUpdatedAt, expectedRevision } = parsed.value;

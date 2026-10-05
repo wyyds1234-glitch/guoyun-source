@@ -11,9 +11,8 @@ export async function onRequestGet(context) {
 }
 
 export async function onRequestPost({ request, env }) {
-  const body = await request.text();
-  const putRequest = new Request(request.url, { method: "PUT", headers: request.headers, body });
-  return writePrimary({ request: putRequest, env });
+  // Keep authentication and streaming limits at the shared write boundary.
+  return writePrimary({ request, env });
 }
 
 export async function onRequestDelete() {
