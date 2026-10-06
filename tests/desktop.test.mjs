@@ -41,7 +41,7 @@ test("desktop package is a local Tauri bundle, not a remote webview", () => {
 });
 
 test("desktop release pipeline builds ad-hoc macOS and Windows installers", () => {
-  assert.match(workflow, /tauri-apps\/tauri-action@v1/);
+  assert.match(workflow, /tauri-apps\/tauri-action@[a-f0-9]{40}/);
   assert.match(workflow, /macos-latest/);
   assert.match(workflow, /windows-latest/);
   assert.match(workflow, /aarch64-apple-darwin/);

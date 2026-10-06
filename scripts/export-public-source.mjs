@@ -10,6 +10,31 @@ export function allowedSource(path, installerPaths) {
     || ['README.md', '.gitignore', 'package.json', 'package-lock.json', 'wrangler.jsonc', 'worker-configuration.d.ts', 'foundation/assets.json', '.github/workflows/tauri-release.yml'].includes(path);
 }
 
+export function publicSourceContent(path, content) {
+  if (path === 'package.json') {
+    const pkg = JSON.parse(content);
+    for (const name of ['deploy', 'deploy:preview', 'db:migrate:remote', 'db:migrate:preview']) delete pkg.scripts[name];
+    return JSON.stringify(pkg, null, 2) + '\n';
+  }
+  if (path === '.github/workflows/tauri-release.yml') {
+    content = content.replace('  push:\n    tags: ["v*.*.*"]\n', '');
+    for (const job of ['validate-source', 'build', 'publish-manifest']) {
+      content = content.replace(new RegExp(`(^  ${job}:\\n)(?:    if:.*\\n)?`, 'm'), `$1    if: github.repository == 'wyyds1234-glitch/guoyun'\n`);
+    }
+  }
+  if (path === 'wrangler.jsonc') {
+    const config = JSON.parse(content);
+    config.name = 'guoyun-local';
+    delete config.env;
+    for (const binding of config.d1_databases || []) {
+      binding.database_name = 'guoyun-local-data';
+      binding.database_id = '00000000-0000-0000-0000-000000000000';
+    }
+    return JSON.stringify(config, null, 2) + '\n';
+  }
+  return content;
+}
+
 const secretPatterns = [
   /-----BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY-----/,
   /\b(?:ghp_|github_pat_)[A-Za-z0-9_]{20,}/,
@@ -35,12 +60,9 @@ export function exportPublicSource(source, destination) {
     const target = join(destination, path);
     mkdirSync(dirname(target), { recursive: true });
     let bytes = readFileSync(join(source, path));
-    if (path === '.github/workflows/tauri-release.yml') {
-      // Preserve the build recipe, but prevent the public copy from deploying
-      // production or publishing packages. Production runs in the private repo.
-      bytes = Buffer.from(bytes.toString('utf8').replace('  push:\n    tags: ["v*.*.*"]\n', '').replace('  build:\n', "  build:\n    if: github.repository == 'wyyds1234-glitch/guoyun'\n"));
+    if (['package.json', 'wrangler.jsonc', '.github/workflows/tauri-release.yml'].includes(path)) {
+      bytes = Buffer.from(publicSourceContent(path, bytes.toString('utf8')));
     }
-    if (path === 'wrangler.jsonc') bytes = Buffer.from(bytes.toString('utf8').replace(/"database_id":\s*"[^"]+"/, '"database_id": "00000000-0000-0000-0000-000000000000"'));
     writeFileSync(target, bytes, { mode: statSync(join(source, path)).mode & 0o777 });
   }
   writeFileSync(join(destination, 'BUILDING.md'), `# 构建游戏源码\n\n本仓库是公开源码副本，不包含生产凭据、玩家存档、内部报告或旧 Git 历史。\n\n推荐 Node.js 24。安装并检查：\n\n\`\`\`sh\nnpm ci\nnpm run check\nnpm test\nnpm run types:check\nnpm run dev\n\`\`\`\n\n本地游戏入口为开发服务器的 /play/。部署自有后端时，需创建自己的 D1 数据库并替换 wrangler.jsonc 中的占位 ID，再执行迁移；不共享正式玩家数据。\n\n桌面版使用 Tauri 2，另需 Rust 和平台构建依赖。\`npm run desktop:prepare\` 准备内置前端；安装 Tauri CLI 后按本机平台构建。桌面发布工作流仅作构建参考，在公开副本中禁用生产发布。\n\n地图与依赖授权见 [数据来源](public/data/SOURCES.md)。源码开放查看、下载不等于对第三方素材另行授予许可。\n`);

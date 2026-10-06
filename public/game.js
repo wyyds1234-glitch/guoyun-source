@@ -966,6 +966,14 @@
     const numeric = Number(value);
     return numberFormat.format(Number.isFinite(numeric) ? Math.max(0, Math.round(numeric)) : 0);
   }
+  // Only literal template markup is trusted. Saves and imported names are
+  // plain text, including when they contain characters that look like HTML.
+  function safeHtml(strings, ...values) {
+    const entities = { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" };
+    return strings.reduce((html, literal, index) => html + literal + (index < values.length
+      ? String(values[index] ?? "").replace(/[&<>"']/g, (character) => entities[character])
+      : ""), "");
+  }
   function eraText() {
     const year = state.calendar?.year || ERA.year;
     const month = state.calendar?.month || 1;
@@ -2547,7 +2555,7 @@
       button.type = "button";
       button.className = "court-action";
       button.disabled = state.actionPoints < 1 || !hasResources(cost);
-      button.innerHTML = `<span class="court-icon">${action.icon}</span><span><b>${action.name}</b><small>${action.description}</small><em>${costText(cost)} · 1 行动力</em></span><strong>${action.effect}</strong>`;
+      button.innerHTML = safeHtml`<span class="court-icon">${action.icon}</span><span><b>${action.name}</b><small>${action.description}</small><em>${costText(cost)} · 1 行动力</em></span><strong>${action.effect}</strong>`;
       button.addEventListener("click", () => performCourtAction(action));
       container.appendChild(button);
     });
@@ -2597,7 +2605,7 @@
         button.type = "button";
         button.className = "frontier-target";
         const status = province.siege ? `攻城 ${Math.round(province.siege.progress)}%` : `守备 ${fmt(enemyDefense(province))}`;
-        button.innerHTML = `<b>${province.name}</b><span>${ownerName(province.owner)} · ${province.terrain}</span><strong>${status}</strong>`;
+        button.innerHTML = safeHtml`<b>${province.name}</b><span>${ownerName(province.owner)} · ${province.terrain}</span><strong>${status}</strong>`;
         button.addEventListener("click", () => openBattle(id));
         frontier.appendChild(button);
       });
@@ -2839,7 +2847,7 @@
       const row = document.createElement("div");
       row.className = "diplomacy-row";
       row.style.setProperty("--faction-color", faction.color);
-      row.innerHTML = `<i></i><span><b>${faction.name}</b><small>控制 ${provinces} 道 · ${faction.relation}</small></span><strong>${faction.relation === "友善" ? "+35" : faction.relation === "敌视" ? "-55" : "+0"}</strong>`;
+      row.innerHTML = safeHtml`<i></i><span><b>${faction.name}</b><small>控制 ${provinces} 道 · ${faction.relation}</small></span><strong>${faction.relation === "友善" ? "+35" : faction.relation === "敌视" ? "-55" : "+0"}</strong>`;
       list.appendChild(row);
     });
     if (!count) {
@@ -2860,7 +2868,7 @@
     decisions.forEach((decision) => {
       const node = document.createElement("article");
       node.className = "decision-card";
-      node.innerHTML = `<b>${decision.title}</b><p>${decision.text}</p><button type="button">颁布决策</button>`;
+      node.innerHTML = safeHtml`<b>${decision.title}</b><p>${decision.text}</p><button type="button">颁布决策</button>`;
       node.querySelector("button").addEventListener("click", () => enactDecision(decision.action));
       $("decisionList").appendChild(node);
     });
@@ -4387,7 +4395,7 @@
     const contentKey = ["province", id, province.owner, province.prosperity, province.farms, province.fieldTroops, province.garrison, province.defense, state.population].join("|");
     if (tooltip.dataset.contentKey !== contentKey) {
       tooltip.dataset.contentKey = contentKey;
-      tooltip.innerHTML = `<b>${province.name} · ${province.capital}</b>${ownerName(province.owner)}（${relation}）<br>人口规模 ${fmt(Math.round(state.population * province.prosperity / Math.max(1, totalProsperity)))}点 · 粮产 ${fmt((province.farms || 1) * 80 + province.prosperity)}<br>驻军 ${fmt((province.fieldTroops || 0) + (province.garrison || 0))} · 城防 ${fmt(province.defense)} · ${province.terrain}`;
+      tooltip.innerHTML = safeHtml`<b>${province.name} · ${province.capital}</b>${ownerName(province.owner)}（${relation}）<br>人口规模 ${fmt(Math.round(state.population * province.prosperity / Math.max(1, totalProsperity)))}点 · 粮产 ${fmt((province.farms || 1) * 80 + province.prosperity)}<br>驻军 ${fmt((province.fieldTroops || 0) + (province.garrison || 0))} · 城防 ${fmt(province.defense)} · ${province.terrain}`;
     }
     tooltip.classList.remove("hidden");
     queueTooltipPosition(event);
@@ -4398,10 +4406,10 @@
     const region = state.regions[id];
     if (!region) return hideMapTooltip();
     const tooltip = $("mapTooltip");
-    const contentKey = ["region", id, state.calendar.year, regionController(region), region.population, region.grain, region.garrison, region.defense].join("|");
+    const contentKey = ["region", id, state.calendar.year, state.ruler, state.kingdom, regionController(region), region.population, region.grain, region.garrison, region.defense, region.fort].join("|");
     if (tooltip.dataset.contentKey !== contentKey) {
       tooltip.dataset.contentKey = contentKey;
-      tooltip.innerHTML = `<b>${regionDisplayName(region, state.calendar.year)}</b><span>所属道 · ${PROVINCES[region.province].name}</span><span>州府 · ${region.admin}</span><span>控制者 · ${regionOwnerName(region)}</span><span>地形 · ${region.terrain} · ${REGION_DATA.typeNames[region.type]}</span><strong>驻军 ${fmt(region.garrison)} · 城防 ${fmt(region.defense + region.fort * 8)}</strong>`;
+      tooltip.innerHTML = safeHtml`<b>${regionDisplayName(region, state.calendar.year)}</b><span>所属道 · ${PROVINCES[region.province].name}</span><span>州府 · ${region.admin}</span><span>控制者 · ${regionOwnerName(region)}</span><span>地形 · ${region.terrain} · ${REGION_DATA.typeNames[region.type]}</span><strong>驻军 ${fmt(region.garrison)} · 城防 ${fmt(region.defense + region.fort * 8)}</strong>`;
     }
     tooltip.classList.remove("hidden");
     queueTooltipPosition(event);

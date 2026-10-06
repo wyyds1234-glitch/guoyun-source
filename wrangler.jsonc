@@ -1,8 +1,10 @@
 {
   "$schema": "./node_modules/wrangler/config-schema.json",
-  "name": "tianxia",
+  "name": "guoyun-local",
   "compatibility_date": "2026-08-13",
-  "compatibility_flags": ["nodejs_compat"],
+  "compatibility_flags": [
+    "nodejs_compat"
+  ],
   "pages_build_output_dir": "./public",
   "placement": {
     "mode": "smart"
@@ -10,7 +12,7 @@
   "d1_databases": [
     {
       "binding": "GAME_DB",
-      "database_name": "tianxia-game-data",
+      "database_name": "guoyun-local-data",
       "database_id": "00000000-0000-0000-0000-000000000000",
       "migrations_dir": "./migrations"
     }

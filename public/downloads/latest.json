@@ -14,7 +14,8 @@
     "windows_x64": {
       "available": true,
       "asset": "/downloads/Guoyun-Setup-0.1.15.exe",
-      "size": 7659974
+      "size": 7659974,
+      "sha256": "d40eb803b59f65c6ca23c98de38a778492d3096206e12823d2d23081bd28e63f"
     }
   }
 }
