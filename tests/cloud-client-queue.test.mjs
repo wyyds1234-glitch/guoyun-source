@@ -35,6 +35,13 @@ test('network failure does not permanently block the save queue',async()=>{
   await assert.rejects(api.save({gold:1}));await api.save({gold:2});
   assert.equal(api.getStatus().state,'ready');assert.equal(api.isDirty(),false);
 });
+test('storage quota failures retain dirty local progress without retrying as offline', async () => {
+  const api=client(async()=>new Response(JSON.stringify({ok:false,error:{code:'save_storage_full',message:'云端存档空间已满；本地进度仍保留。'}}),{status:507}));
+  await assert.rejects(api.save({gold:1}),error=>error.code==='save_storage_full');
+  assert.equal(api.isDirty(),true);
+  assert.equal(api.getStatus().state,'failed');
+  assert.match(api.getStatus().message,/本地进度仍保留/);
+});
 test('waiting for pending saves settles after queued writes even when an earlier write fails',async()=>{
   let releaseFirst,calls=0,settled=false;
   const api=client(async()=>{

@@ -954,7 +954,7 @@
         await window.TianxiaCloudSave.save(state);
         cloudRetryAttempt = 0;
       } catch (error) {
-        if (error?.code === "save_conflict" || error?.code === "auto_sync_disabled") return;
+        if (error?.code === "save_conflict" || error?.code === "auto_sync_disabled" || error?.code === "save_storage_full") return;
         cloudRetryAttempt = Math.min(cloudRetryAttempt + 1, 6);
         scheduleCloudSave(false);
       }
@@ -1512,7 +1512,7 @@
     if (panel) panel.querySelector("b").textContent = incompatibleCloudSave && inspectedCloudReadable ? "云端存档已更新" : incompatibleCloudSave ? "云端存档版本不兼容" : autoSyncDisabled ? "云端自动同步已暂停" : hasSynced ? "云端已同步" : stateName === "connecting" ? "连接中 · 云端" : stateName === "syncing" ? "同步中 · 云端" : stateName === "offline" ? "离线，仅使用本地缓存" : stateName === "conflict" ? "同步失败 · 云端版本冲突" : stateName === "idle" ? "云端待命" : "同步失败";
     if (panel) panel.querySelector("small").textContent = incompatibleCloudSave && inspectedCloudReadable ? "云端现有进度可以读取。自动同步仍暂停；立即同步会要求确认覆盖。" : incompatibleCloudSave ? "本机缓存和云端存档均已保留。点击立即同步并确认后，可用本机进度替换云端。" : autoSyncDisabled ? detail.message || "手动同步可重新启用云端存档" : detail.updatedAt
       ? `最近同步：${new Date(detail.updatedAt).toLocaleString("zh-CN")}`
-      : stateName === "offline" ? "恢复联网后将自动重试；本地进度不会丢失" : stateName === "conflict" ? "另一台设备已更新这份王业，请读取后再保存" : stateName === "connecting" ? "正在连接 Cloudflare 云端" : stateName === "syncing" ? "正在同步 Cloudflare 云端" : "本地缓存可在断网时继续使用";
+      : detail.message || (stateName === "offline" ? "恢复联网后将自动重试；本地进度不会丢失" : stateName === "conflict" ? "另一台设备已更新这份王业，请读取后再保存" : stateName === "connecting" ? "正在连接 Cloudflare 云端" : stateName === "syncing" ? "正在同步 Cloudflare 云端" : "本地缓存可在断网时继续使用");
     const note = $("autosaveNote");
     // Keep the idle label clear while the first cloud request is pending.
     if (note) note.dataset.cloudState = stateName;

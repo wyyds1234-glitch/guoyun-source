@@ -306,6 +306,12 @@
         emit({ state: "conflict", message: "云端版本冲突，请先读取最新存档" });
         throw conflict;
       }
+      if (response.status === 507) {
+        const error = new Error("云端存档空间已满；本地进度仍保留，但暂时无法同步新存档。请联系管理员处理。");
+        error.code = "save_storage_full";
+        emit({ state: "failed", message: error.message });
+        throw error;
+      }
       if (!response.ok) throw new Error(`cloud save ${response.status}`);
       const body = await response.json();
       if (getAccessCode() !== code) return body;
@@ -315,7 +321,7 @@
     } catch (error) {
       if (getAccessCode() !== code) throw error;
       writeMeta({ dirty: true });
-      if (error?.code !== "save_conflict") {
+      if (error?.code !== "save_conflict" && error?.code !== "save_storage_full") {
         emit({ state: "offline", message: navigator.onLine ? "云端写入失败，已保留本地缓存" : "当前离线，已保留本地缓存" });
       }
       throw error;

@@ -51,7 +51,7 @@ function streamedRequest(route, chunks, options = {}) {
 
 function database() {
   const sql = new DatabaseSync(":memory:");
-  for (const name of ["0001_cloud_save.sql", "0002_cloud_sessions_and_versions.sql"]) {
+  for (const name of ["0001_cloud_save.sql", "0002_cloud_sessions_and_versions.sql", "0003_cloud_storage_quota.sql"]) {
     sql.exec(readFileSync(new URL(`../migrations/${name}`, import.meta.url), "utf8"));
   }
   const db = {

@@ -7,7 +7,7 @@ import {onRequestPut} from '../functions/api/save.js';
 
 function database() {
   const sql=new DatabaseSync(':memory:');
-  for(const name of ['0001_cloud_save.sql','0002_cloud_sessions_and_versions.sql']) sql.exec(readFileSync(new URL(`../migrations/${name}`,import.meta.url),'utf8'));
+  for(const name of ['0001_cloud_save.sql','0002_cloud_sessions_and_versions.sql','0003_cloud_storage_quota.sql']) sql.exec(readFileSync(new URL(`../migrations/${name}`,import.meta.url),'utf8'));
   let racing=false,arrivals=0,release;
   const gate=new Promise(resolve=>release=resolve);
   return {sql,race(){racing=true;},prepare(query){return {bind(...values){

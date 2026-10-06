@@ -202,6 +202,10 @@ export async function onRequestPut({ request, env }) {
     return jsonFor(request, { ok: true, revision: saved.revision, updatedAt: savedAt, mapVersion: summary.mapVersion || MAP_VERSION });
   } catch (error) {
     console.error(JSON.stringify({ message: "cloud save write failed", error: error instanceof Error ? error.message : String(error) }));
+    const message = error instanceof Error ? error.message : String(error);
+    if (message.includes("game_player_quota_exceeded") || message.includes("game_save_quota_exceeded")) {
+      return errorFor(request, 507, "save_storage_full", "云端存档空间已满；本地进度仍保留，但暂时无法同步新存档。请联系管理员处理。");
+    }
     return errorFor(request, 500, "save_write_failed", "写入云端存档失败。");
   }
 }
